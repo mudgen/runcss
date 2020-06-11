@@ -1,0 +1,31 @@
+{
+  "name": "runcss",
+  "version": "0.0.1",
+  "description": "A utility-first CSS runtime for rapid UI development.",
+  "main": "./src/runcss.js",
+  "scripts": {
+    "build": "microbundle src/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mudgen/runcss.git"
+  },
+  "keywords": [
+    "css",
+    "javascript",
+    "ui"
+  ],
+  "author": "Nick Mudge",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mudgen/runcss/issues"
+  },
+  "homepage": "https://github.com/mudgen/runcss#readme",
+  "devDependencies": {
+    "microbundle": "^0.12.0",
+    "standard": "^14.3.4"
+  },
+  "dependencies": {
+    "webscript": "^0.2.0"
+  }
+}
