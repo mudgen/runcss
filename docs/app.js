@@ -12,7 +12,7 @@ const app =
   div(
     ul(
       li.class`pl-1.9em lg:pl-100``hello`,
-      li.class`mt-3``Great`,
+      li.class`mt-30 text-rgb(200,100,100)``Great`,
       li.class`px-50 lg:hidden``fine`
     )
   )

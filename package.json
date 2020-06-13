@@ -2,7 +2,7 @@
   "name": "runcss",
   "version": "0.0.1",
   "description": "A utility-first CSS runtime for rapid UI development.",
-  "main": "./src/runcss.js",
+  "main": "dist/runcss.js",
   "scripts": {
     "build": "microbundle src/*.js"
   },
