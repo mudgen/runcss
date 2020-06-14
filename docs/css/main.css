@@ -261,3 +261,16 @@ textarea {
   }
 }
 
+/*
+.space-x-4>*+*{
+  border: 1px solid;
+  margin-left: 5rem;
+}
+*/
+/*
+.space-x-4>:not(template)~:not(template) {
+  --space-x-reverse: 0!important;
+  margin-right: calc(2rem*var(--space-x-reverse))!important;
+  margin-left: calc(2rem*(1 - var(--space-x-reverse)))!important;
+}
+*/

@@ -9,11 +9,17 @@ const { body, div, p, ul, li } = builders((type, props, ...children) => {
 })
 
 const app =
-  div(
+  div.class`font-sans leading-300%`(
     ul(
-      li.class`pl-1.9em lg:pl-100``hello`,
-      li.class`mt-30 text-rgb(200,100,100)``Great`,
-      li.class`px-50 lg:hidden``fine`
+      li.class`pl-1.9em lg:pl-100 tracking-widest``hello`,
+      li.class`mt-30 text-pink-700 text-opacity-25``Great`,
+      li.class`px-50 lg:hidden``fine`,
+      li.class`px-5 text-pink-700``Another little test`,
+      li.class`space-x-reverse space-x-4 flex flex-row-reverse`(
+        p`Interesting`,
+        p`Indeed`,
+        p`Who told you?`
+      )
     )
   )
 
