@@ -452,6 +452,18 @@ let cls2process = newObject({
   },
   duration: timeProp,
   delay: timeProp,
+  ease: () => {
+    let ruleFunc = (value) => `-webkit-transition-timing-function:${value};-o-transition-timing-function:${value};transition-timing-function:${value}`
+    if (rest === 'in') {
+      rule = ruleFunc('cubic-bezier(0.4,0,1,1)')
+    } else if (rest === 'out') {
+      rule = ruleFunc('cubic-bezier(0,0,0.2,1)')
+    } else if (rest === 'in-out') {
+      rule = ruleFunc('cubic-bezier(0.4,0,0.2,1)')
+    } else if (rest === 'linear') {
+      rule = ruleFunc('linear')
+    }
+  },
   scale: () => {
     if (isNum(lastPart)) {
       let v = lastPart / 100
@@ -495,7 +507,8 @@ let cls2process = newObject({
   },
   origin: () => {
     if (includes('center!top!top-right!right!bottom-right!bottom!bottom-left!left!top-left', rest)) {
-      rule = 'transform-origin:' + rest.replace('-', ' ')
+      rest = rest.replace('-', ' ')
+      rule = `-webkit-transform-origin:${rest};-ms-transform-origin:${rest};transform-origin:` + rest
     }
   },
   cursor: () => {
@@ -536,7 +549,7 @@ let cls2process = newObject({
   },
   select: () => {
     if (includes('none!auto!text!contain!all!inherit!initial!unset', rest)) {
-      rule = 'user-select:' + rest
+      rule = `-webkit-user-select:${rest};-moz-user-select:${rest};-ms-user-select:${rest};user-select:` + rest
     }
   },
   fill: () => {
