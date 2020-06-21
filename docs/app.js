@@ -19,16 +19,23 @@ const app =
         p`Interesting`,
         p`Indeed`,
         p`Who told you?`
+      ),
+      li.class`space-x-4 flex`(
+        p`Interesting`,
+        p`Indeed`,
+        p`Who told you?`
       )
     ),
     input.class`placeholder-gray-800 placeholder-opacity-20 text-blue-600 `.placeholder`jane@example.com`,
     input.class`placeholder-red-300 border-green-900`.placeholder`mytest!!!`,
-    div.class`bg-blue-600 rounded-none lg:rounded-b-lg border-8 border-green-800 border-opacity-30``hello!`,
+    div.class`bg-blue-600 rounded-none lg:rounded-b-lg border-18 border-green-800 border-opacity-30``hello!`,
     div.class`border-0.7rem``hello another`,
     div.class`grid grid-cols-3 divide-opacity-22 divide-x-5 divide-yellow-700 w-500px border-4 mt-20 ml-10 `(
       div.class`text-center``1`,
       div.class`text-center``2`,
-      div.class`text-center``3`)
+      div.class`text-center``3`),
+    div.class`ml-10 mt-10 nick text-green-500``Transform`,
+    div.class`ml-10 mt-10 transform rotate-10 scale-x-50``Transform Again`
 
   )
 
