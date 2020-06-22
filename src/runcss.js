@@ -26,9 +26,9 @@ for (let a of split('sm|@media(min-width:640px){}!md|@media(min-width:768px){}!l
 
 let cls
 let originalClass
-let classAdd
 
 export let processClasses = (classes) => {
+  classes = classes.trim()
   if (elementClassesCache.has(classes)) {
     return
   }
@@ -54,7 +54,7 @@ let formatters = newObject({
 let classNames = newObject({})
 
 // direct map from class to values
-for (let c of split('box-border|-webkit-box-sizing:border-box;box-sizing:border-box!box-content|-webkit-box-sizing:content-box;box-sizing:content-box!hidden|display:none!object-scale-down|object-fit:scale-down;-o-object-fit:scale-down!scrolling-touch|-webkit-overflow-scrolling:touch!scrolling-auto|-webkit-overflow-scrolling:auto!visible|visibility:visible!invisible|visibility:hidden!order-first|order:-9999!order-last|order:9999!order-none|order:0!grid-cols-none|grid-template-columns:none!col-auto|grid-column:auto!col-start-auto|-ms-grid-column:auto;grid-column-start:auto!col-end-auto|-ms-grid-column-span:auto;grid-column-end:auto!grid-rows-none|-ms-grid-rows:none;grid-template-rows:none!row-auto|grid-row:auto!row-start-auto|-ms-grid-row:auto;grid-row-start:auto!row-end-auto|-ms-grid-row-span:auto;grid-row-end:auto!gap-px|gap:1px!row-gap-px|row-gap:1px!grid-flow-row|grid-auto-flow:row!grid-flow-col|grid-auto-flow:column!grid-flow-row-dense|grid-auto-flow:row dense!grid-flow-col-dense|grid-auto-flow:column dense!min-w-full|min-width:100%!max-w-full|max-width:100%!max-w-screen-sm|max-width:640px!max-w-screen-md|max-width:768px!max-w-screen-lg|max-width:1024px!max-w-screen-xl|max-width:1280px!max-w-none|max-width:none!min-h-full|min-height:100%!min-h-screen|min-height:100vh!max-h-full|max-height:100%!max-h-screen|max-height:100vh!text-2xl|font-size:1.5rem!text-3xl|font-size:1.875rem!text-4xl|font-size:2.25rem!text-left|text-align:left!text-center|text-align:center!text-right|text-align:right!text-justify|text-align:justify!underline|text-decoration:underline!line-through|text-decoration:line-through!no-underline|text-decoration:none!uppercase|text-transform:uppercase!lowercase|text-transform:lowercase!capitalize|text-transform:capitalize!normal-case|text-transform:none!whitespace-no-wrap|white-space:nowrap!break-normal|word-break:normal;overflow-wrap:normal!break-words|overflow-wrap:break-word!break-all|word-break:break-all!truncate|overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap!h-auto|height:auto!max-w-2xl|max-width:42rem!tracking-tighter|letter-spacing:-0.05em!tracking-tight|letter-spacing:-0.025em!tracking-normal|0!tracking-wide:letter-spacing:0.025em!tracking-wider|letter-spacing:0.05em!tracking-widest|letter-spacing: 0.1em!leading-none|line-height:1!leading-tight|line-height:1.25!leading-snug|line-height:1.375!leading-normal|line-height:1.5!leading-relaxed|line-height:1.625!leading-loose|line-height:2!list-none|list-style-type:none!list-disc|list-style-type:disc!list-decimal|list-style-type:decimal!list-inside|list-style-position:inside!list-outside|list-style-position:outside!border|border-width:1px!border-collapse|border-collapse:collapse!border-separate|border-collapse:separate!table-auto|table-layout:auto!table-fixed|table-layout:fixed!appearance-none|-webkit-appearance:none;-moz-appearance:none;appearance:none!outline-none|outline:0!resize-none|resize:none!resize|resize:both!resize-y|resize:vertical!resize-x|resize:horizontal!fill-current|fill:currentColor!stroke-current|stroke:currentColor!sr-only|position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0!not-sr-only|position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal!font-sans|font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji!font-serif|font-family:Georgia,Cambria,"Times New Roman",Times,serif!font-mono|font-family:Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace')) {
+for (let c of split('box-border|-webkit-box-sizing:border-box;box-sizing:border-box!box-content|-webkit-box-sizing:content-box;box-sizing:content-box!hidden|display:none!object-scale-down|object-fit:scale-down;-o-object-fit:scale-down!scrolling-touch|-webkit-overflow-scrolling:touch!scrolling-auto|-webkit-overflow-scrolling:auto!visible|visibility:visible!invisible|visibility:hidden!order-first|order:-9999!order-last|order:9999!order-none|order:0!grid-cols-none|grid-template-columns:none!col-auto|grid-column:auto!col-start-auto|-ms-grid-column:auto;grid-column-start:auto!col-end-auto|-ms-grid-column-span:auto;grid-column-end:auto!grid-rows-none|-ms-grid-rows:none;grid-template-rows:none!row-auto|grid-row:auto!row-start-auto|-ms-grid-row:auto;grid-row-start:auto!row-end-auto|-ms-grid-row-span:auto;grid-row-end:auto!gap-px|gap:1px!row-gap-px|row-gap:1px!grid-flow-row|grid-auto-flow:row!grid-flow-col|grid-auto-flow:column!grid-flow-row-dense|grid-auto-flow:row dense!grid-flow-col-dense|grid-auto-flow:column dense!min-w-full|min-width:100%!max-w-full|max-width:100%!max-w-screen-sm|max-width:640px!max-w-screen-md|max-width:768px!max-w-screen-lg|max-width:1024px!max-w-screen-xl|max-width:1280px!max-w-none|max-width:none!min-h-full|min-height:100%!min-h-screen|min-height:100vh!max-h-full|max-height:100%!max-h-screen|max-height:100vh!text-2xl|font-size:1.5rem!text-3xl|font-size:1.875rem!text-4xl|font-size:2.25rem!text-left|text-align:left!text-center|text-align:center!text-right|text-align:right!text-justify|text-align:justify!underline|text-decoration:underline!line-through|text-decoration:line-through!no-underline|text-decoration:none!uppercase|text-transform:uppercase!lowercase|text-transform:lowercase!capitalize|text-transform:capitalize!normal-case|text-transform:none!whitespace-no-wrap|white-space:nowrap!break-normal|word-break:normal;overflow-wrap:normal!break-words|overflow-wrap:break-word!break-all|word-break:break-all!truncate|overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap!h-auto|height:auto!max-w-2xl|max-width:42rem!tracking-tighter|letter-spacing:-0.05em!tracking-tight|letter-spacing:-0.025em!tracking-normal|0!tracking-wide:letter-spacing:0.025em!tracking-wider|letter-spacing:0.05em!tracking-widest|letter-spacing: 0.1em!leading-none|line-height:1!leading-tight|line-height:1.25!leading-snug|line-height:1.375!leading-normal|line-height:1.5!leading-relaxed|line-height:1.625!leading-loose|line-height:2!list-none|list-style-type:none!list-disc|list-style-type:disc!list-decimal|list-style-type:decimal!list-inside|list-style-position:inside!list-outside|list-style-position:outside!border|border-width:1px!border-collapse|border-collapse:collapse!border-separate|border-collapse:separate!table-auto|table-layout:auto!table-fixed|table-layout:fixed!appearance-none|-webkit-appearance:none;-moz-appearance:none;appearance:none!outline-none|outline:0!resize-none|resize:none!resize|resize:both!resize-y|resize:vertical!resize-x|resize:horizontal!fill-current|fill:currentColor!stroke-current|stroke:currentColor!sr-only|position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0!not-sr-only|position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal!font-sans|font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji!font-serif|font-family:Georgia,Cambria,"Times New Roman",Times,serif!font-mono|font-family:Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!sticky|position:-webkit-sticky;position:sticky')) {
   let [k, v] = c.split('|')
   classNames[k] = v
 }
@@ -80,7 +80,7 @@ for (let c of split('block!flow-root!inline-block!inline!flex!grid!inline-grid!t
 }
 
 // position
-for (let c of split('static!fixed!absolute!relative!sticky')) {
+for (let c of split('static!fixed!absolute!relative')) {
   classNames[c] = 'position:' + c
 }
 
@@ -277,7 +277,7 @@ let cls2process = newObject({
     }
   },
   space: () => {
-    classAdd = '>:not(template)~:not(template)'
+    pseudos = ['>:not(template)~:not(template)']
     if (thirdPart === 'px') {
       thirdPart = '1px'
     }
@@ -295,7 +295,7 @@ let cls2process = newObject({
     }
   },
   divide: () => {
-    classAdd = '>:not(template)~:not(template)'
+    pseudos = ['>:not(template)~:not(template)']
     if (partsLength < 4) {
       let v
       if (isNum(thirdPart)) {
@@ -357,7 +357,7 @@ let cls2process = newObject({
     }
   },
   placeholder: () => {
-    classAdd = '::placeholder'
+    pseudos.push('::placeholder')
     setColor('color')
   },
   align: () => {
@@ -439,7 +439,7 @@ let cls2process = newObject({
     let ruleFunc2 = (value) => `-webkit-transition-property:-webkit-${value};transition-property:-webkit-${value};-o-transition-property:${value};transition-property:${value};transition-property:${value},-webkit-${value}`
     if (!secondPart) {
       rule = '-webkit-transition-property:S-webkit-box-shadow,-webkit-transform;transition-property:S-webkit-box-shadow,-webkit-transform;-o-transition-property:Sbox-shadow,transform;transition-property:Sbox-shadow,transform;transition-property:Sbox-shadow,transform,-webkit-box-shadow,-webkit-transform'
-      rule = rule.replace('S', 'background-color,border-color,color,fill,stroke,opacity,')
+      rule = rule.replace(/S/g, 'background-color,border-color,color,fill,stroke,opacity,')
     } else if (secondPart === 'colors') {
       rule = ruleFunc('background-color,border-color,color,fill,stroke')
     } else if (secondPart === 'shadow') {
@@ -532,7 +532,7 @@ let cls2process = newObject({
       })
       let v = shadows[thirdPart]
       if (v) {
-        v = v.replace('R', ' rgba(0, 0, 0, 0')
+        v = v.replace(/R/g, ' rgba(0, 0, 0, 0')
         rule = `-webkit-box-shadow:${v};box-shadow:` + v
       }
     }
@@ -626,18 +626,22 @@ let rest
 let partsLength // parts.length
 let negative
 let rule
+let pseudos
+let pseudosRegex = /[^:]+::?|.+/g
 
 function processClass () {
   sheet = parentSheet
   rule = ''
   negative = ''
-  classAdd = ''
   originalClass = cls
-  parts = cls.split(':')
-  if (parts.length > 1) {
-    cls = parts[parts.length - 1]
-    if (media.has(parts[0])) {
-      sheet = media.get(parts[0])
+  pseudos = cls.match(pseudosRegex)
+  cls = pseudos.pop()
+  pseudos = pseudos.map(v => v.endsWith('::') ? '::' + v.slice(0, -2) : ':' + v.slice(0, -1))
+  if (pseudos.length > 0) {
+    let mediaQuery = media.get(pseudos[0].slice(1))
+    if (mediaQuery) {
+      sheet = mediaQuery
+      pseudos.shift()
     }
   }
   if (cls[0] === '-') {
@@ -720,7 +724,7 @@ function notFound () {
       // eslint-disable-next-line no-undef
       if (rule.type === CSSRule.STYLE_RULE) {
         if (rule.selectorText.split(',').map((item) => item.trim()).includes('.' + cls)) {
-          cls = originalClass.replace(/[.:]/, '\\$&')
+          cls = originalClass.replace(/[.:]/g, '\\$&')
           // console.log(`.${cls}${rule.cssText.slice(rule.cssText.indexOf('{'))}`)
           sheet.insertRule(`.${cls}${rule.cssText.slice(rule.cssText.indexOf('{'))}`, sheet.length)
           return
@@ -730,8 +734,43 @@ function notFound () {
   }
 }
 
+// pseudos = split('::-webkit-input-P!::-moz-P!:-ms-input-P!::-ms-input-P!::P'.replace(/P/g, 'placeholder'))
+let pseudoVendorPrefixes = newObject({
+  '::placeholder': '::-webkit-input-P!::-moz-P!:-ms-input-P!::-ms-input-P'.replace(/P/g, 'placeholder'),
+  '::selection': ':::-moz-selection'
+})
+
 function setRule (t) {
-  cls = originalClass.replace(/[.:()%,#]/g, '\\$&') + classAdd
-  // console.log(`.${cls}{${t}}`)
-  sheet.insertRule(`.${cls}{${t}}`, sheet.length)
+  cls = originalClass.replace(/[.:()%,#]/g, '\\$&')
+  // console.log(cls)
+  if (pseudos.length > 0) {
+    for (const pseudo of [...pseudos]) {
+      let prefixes = pseudoVendorPrefixes[pseudo]
+      if (prefixes) {
+        pseudos.push(...split(prefixes))
+      }
+    }
+    for (let pseudo of pseudos) {
+      // console.log(`.${cls}${pseudo}{${t}}`)
+      if (includes(':first!:last', pseudo)) {
+        pseudo = pseudo + '-child'
+      } else if (includes(':odd!:even', pseudo)) {
+        pseudo = `:nth-child(${pseudo.slice(1)})`
+      } else if (pseudo.startsWith(':group')) {
+        cls = pseudo.slice(1).replace('-', ':') + ' .' + cls
+        pseudo = ''
+      }
+      try {
+        sheet.insertRule(`.${cls}${pseudo}{${t}}`, sheet.length)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  } else {
+    try {
+      sheet.insertRule(`.${cls}{${t}}`, sheet.length)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
