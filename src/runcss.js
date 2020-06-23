@@ -11,6 +11,77 @@ let elementClassesCache = new Map()
 let classesCache = new Map()
 let sheet
 let parentSheet
+let config = newObject({ separator: ':' })
+let componentName
+
+export let component = (name, classes, props) => {
+  if (!name || typeof name !== 'string') {
+    throw Error('Component must have a name.')
+  }
+  componentName = name.trim()
+  if (typeof classes === 'string') {
+    for (cls of classes = classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
+      processClass()
+    }
+  }
+  sheet = parentSheet
+  pseudos = []
+  if (props && typeof props === 'string') {
+    setRule(props)
+  }
+  componentName = ''
+}
+
+let isObject = value => Object.prototype.toString.call(value) === '[object Object]'
+let hex6 = value => {
+  if (typeof value !== 'string') {
+    throw Error('Hex value is not a hex string.')
+  }
+  if (!value.startsWith('#')) {
+    value = '#' + value
+  }
+  value = value.length === 4 ? value.slice(1).split('').map((v) => v + v).join('') : value.slice(1)
+  if (!/^[0-9a-f]{6}$/i.test(value)) {
+    throw Error('Incorrect hex color format.')
+  }
+  return value
+}
+
+let errorNotObject = value => {
+  if (isObject(value)) {
+    throw Error('Config value must be an object.')
+  }
+}
+
+let customColors = new Map([['black', '000000'], ['white', 'ffffff']])
+
+export let configure = (conf = {}) => {
+  for (let s of split('separator!prefix')) {
+    if (conf[s] !== undefined && typeof conf[s] !== 'string') {
+      throw Error(`config.${s} must be a string.`)
+    }
+  }
+  if (conf.screens) {
+    errorNotObject(conf.screen)
+    for (const [prefix, size] of Object.entries(conf.screens)) {
+      setMedia(prefix, size)
+    }
+  } else if (conf.colors) {
+    errorNotObject(conf.colors)
+    for (let [key1, value1] of Object.entries(conf.colors)) {
+      if (isObject(value1)) {
+        for (let [key2, value2] of Object.entries(value1)) {
+          customColors.set(key1 + '-' + key2, hex6(value2))
+        }
+      } else {
+        customColors.set(key1, hex6(value1))
+      }
+    }
+  } else {
+    Object.assign(config, conf)
+  }
+}
+
 if (document.styleSheets.length === 0) {
   parentSheet = document.head.appendChild(document.createElement('style')).sheet
 } else {
@@ -18,10 +89,10 @@ if (document.styleSheets.length === 0) {
 }
 
 let media = new Map()
+let setMedia = (prefix, size) => media.set(prefix, parentSheet.cssRules[parentSheet.insertRule(`@media(min-width:${size}){}`, parentSheet.cssRules.length)])
 
-for (let a of split('sm|@media(min-width:640px){}!md|@media(min-width:768px){}!lg|@media(min-width:1024px){}!xl|@media(min-width:1280px){}')) {
-  a = a.split('|')
-  media.set(a[0], parentSheet.cssRules[parentSheet.insertRule(a[1], parentSheet.cssRules.length)])
+for (let a of split('sm|640px!md|768px!lg|1024px!xl|1280px')) {
+  setMedia(...a.split('|'))
 }
 
 let cls
@@ -33,13 +104,12 @@ export let processClasses = (classes) => {
     return
   }
   elementClassesCache.set(classes, true)
-  classes = classes.replace(/\s\s+/g, ' ').split(' ')
-  for (cls of classes) {
+  for (cls of classes.replace(/\s\s+/g, ' ').split(' ')) {
     if (classesCache.has(cls)) {
       continue
     }
-    processClass()
     classesCache.set(cls, true)
+    processClass()
   }
 }
 
@@ -54,7 +124,7 @@ let formatters = newObject({
 let classNames = newObject({})
 
 // direct map from class to values
-for (let c of split('box-border|-webkit-box-sizing:border-box;box-sizing:border-box!box-content|-webkit-box-sizing:content-box;box-sizing:content-box!hidden|display:none!object-scale-down|object-fit:scale-down;-o-object-fit:scale-down!scrolling-touch|-webkit-overflow-scrolling:touch!scrolling-auto|-webkit-overflow-scrolling:auto!visible|visibility:visible!invisible|visibility:hidden!order-first|order:-9999!order-last|order:9999!order-none|order:0!grid-cols-none|grid-template-columns:none!col-auto|grid-column:auto!col-start-auto|-ms-grid-column:auto;grid-column-start:auto!col-end-auto|-ms-grid-column-span:auto;grid-column-end:auto!grid-rows-none|-ms-grid-rows:none;grid-template-rows:none!row-auto|grid-row:auto!row-start-auto|-ms-grid-row:auto;grid-row-start:auto!row-end-auto|-ms-grid-row-span:auto;grid-row-end:auto!gap-px|gap:1px!row-gap-px|row-gap:1px!grid-flow-row|grid-auto-flow:row!grid-flow-col|grid-auto-flow:column!grid-flow-row-dense|grid-auto-flow:row dense!grid-flow-col-dense|grid-auto-flow:column dense!min-w-full|min-width:100%!max-w-full|max-width:100%!max-w-screen-sm|max-width:640px!max-w-screen-md|max-width:768px!max-w-screen-lg|max-width:1024px!max-w-screen-xl|max-width:1280px!max-w-none|max-width:none!min-h-full|min-height:100%!min-h-screen|min-height:100vh!max-h-full|max-height:100%!max-h-screen|max-height:100vh!text-2xl|font-size:1.5rem!text-3xl|font-size:1.875rem!text-4xl|font-size:2.25rem!text-left|text-align:left!text-center|text-align:center!text-right|text-align:right!text-justify|text-align:justify!underline|text-decoration:underline!line-through|text-decoration:line-through!no-underline|text-decoration:none!uppercase|text-transform:uppercase!lowercase|text-transform:lowercase!capitalize|text-transform:capitalize!normal-case|text-transform:none!whitespace-no-wrap|white-space:nowrap!break-normal|word-break:normal;overflow-wrap:normal!break-words|overflow-wrap:break-word!break-all|word-break:break-all!truncate|overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap!h-auto|height:auto!max-w-2xl|max-width:42rem!tracking-tighter|letter-spacing:-0.05em!tracking-tight|letter-spacing:-0.025em!tracking-normal|0!tracking-wide:letter-spacing:0.025em!tracking-wider|letter-spacing:0.05em!tracking-widest|letter-spacing: 0.1em!leading-none|line-height:1!leading-tight|line-height:1.25!leading-snug|line-height:1.375!leading-normal|line-height:1.5!leading-relaxed|line-height:1.625!leading-loose|line-height:2!list-none|list-style-type:none!list-disc|list-style-type:disc!list-decimal|list-style-type:decimal!list-inside|list-style-position:inside!list-outside|list-style-position:outside!border|border-width:1px!border-collapse|border-collapse:collapse!border-separate|border-collapse:separate!table-auto|table-layout:auto!table-fixed|table-layout:fixed!appearance-none|-webkit-appearance:none;-moz-appearance:none;appearance:none!outline-none|outline:0!resize-none|resize:none!resize|resize:both!resize-y|resize:vertical!resize-x|resize:horizontal!fill-current|fill:currentColor!stroke-current|stroke:currentColor!sr-only|position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0!not-sr-only|position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal!font-sans|font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji!font-serif|font-family:Georgia,Cambria,"Times New Roman",Times,serif!font-mono|font-family:Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!sticky|position:-webkit-sticky;position:sticky')) {
+for (let c of split('box-border|-webkit-box-sizing:border-box;box-sizing:border-box!box-content|-webkit-box-sizing:content-box;box-sizing:content-box!hidden|display:none!object-scale-down|object-fit:scale-down;-o-object-fit:scale-down!scrolling-touch|-webkit-overflow-scrolling:touch!scrolling-auto|-webkit-overflow-scrolling:auto!visible|visibility:visible!invisible|visibility:hidden!order-first|order:-9999!order-last|order:9999!order-none|order:0!grid-cols-none|grid-template-columns:none!col-auto|grid-column:auto!col-start-auto|-ms-grid-column:auto;grid-column-start:auto!col-end-auto|-ms-grid-column-span:auto;grid-column-end:auto!grid-rows-none|-ms-grid-rows:none;grid-template-rows:none!row-auto|grid-row:auto!row-start-auto|-ms-grid-row:auto;grid-row-start:auto!row-end-auto|-ms-grid-row-span:auto;grid-row-end:auto!gap-px|gap:1px!row-gap-px|row-gap:1px!grid-flow-row|grid-auto-flow:row!grid-flow-col|grid-auto-flow:column!grid-flow-row-dense|grid-auto-flow:row dense!grid-flow-col-dense|grid-auto-flow:column dense!min-w-full|min-width:100%!max-w-full|max-width:100%!max-w-screen-sm|max-width:640px!max-w-screen-md|max-width:768px!max-w-screen-lg|max-width:1024px!max-w-screen-xl|max-width:1280px!max-w-none|max-width:none!min-h-full|min-height:100%!min-h-screen|min-height:100vh!max-h-full|max-height:100%!max-h-screen|max-height:100vh!text-2xl|font-size:1.5rem!text-3xl|font-size:1.875rem!text-4xl|font-size:2.25rem!underline|text-decoration:underline!line-through|text-decoration:line-through!no-underline|text-decoration:none!uppercase|text-transform:uppercase!lowercase|text-transform:lowercase!capitalize|text-transform:capitalize!normal-case|text-transform:none!whitespace-no-wrap|white-space:nowrap!break-normal|word-break:normal;overflow-wrap:normal!break-words|overflow-wrap:break-word!break-all|word-break:break-all!truncate|overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap!h-auto|height:auto!max-w-2xl|max-width:42rem!tracking-tighter|letter-spacing:-0.05em!tracking-tight|letter-spacing:-0.025em!tracking-normal|0!tracking-wide:letter-spacing:0.025em!tracking-wider|letter-spacing:0.05em!tracking-widest|letter-spacing: 0.1em!leading-none|line-height:1!leading-tight|line-height:1.25!leading-snug|line-height:1.375!leading-normal|line-height:1.5!leading-relaxed|line-height:1.625!leading-loose|line-height:2!list-none|list-style-type:none!list-disc|list-style-type:disc!list-decimal|list-style-type:decimal!list-inside|list-style-position:inside!list-outside|list-style-position:outside!border|border-width:1px!border-collapse|border-collapse:collapse!border-separate|border-collapse:separate!table-auto|table-layout:auto!table-fixed|table-layout:fixed!appearance-none|-webkit-appearance:none;-moz-appearance:none;appearance:none!outline-none|outline:0!resize-none|resize:none!resize|resize:both!resize-y|resize:vertical!resize-x|resize:horizontal!fill-current|fill:currentColor!stroke-current|stroke:currentColor!sr-only|position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0!not-sr-only|position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal!font-sans|font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji!font-serif|font-family:Georgia,Cambria,"Times New Roman",Times,serif!font-mono|font-family:Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!sticky|position:-webkit-sticky;position:sticky')) {
   let [k, v] = c.split('|')
   classNames[k] = v
 }
@@ -93,29 +163,27 @@ let roundedSize = split('none!sm!nm!md!lg!full')
 let edge = newObject({ l: 'left', r: 'right', t: 'top', b: 'bottom' })
 
 let setColor = (type) => {
-  let color
-  if (thirdPart) {
-    let colorPos = colorNames.indexOf(secondPart)
-    color = colors[colorPos * 9 + (Number(thirdPart[0]) - 1)]
+  if (secondPart === 'opacity' && isNum(thirdPart)) {
+    rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
+  } else {
+    let color = customColors.get(rest)
+    if (!color) {
+      if (thirdPart) {
+        let colorPos = colorNames.indexOf(secondPart)
+        color = colors[colorPos * 9 + (Number(thirdPart[0]) - 1)]
+      } else if (secondPart && secondPart.startsWith('#')) {
+        try {
+          color = hex6(secondPart)
+        } catch {}
+      }
+    }
     if (color) {
       let rgba = type + `:rgba(${parseInt(color.slice(0, 2), 16)},${parseInt(color.slice(2, 4), 16)},${parseInt(color.slice(4, 6), 16)},var(--${type}-opacity,1))`
       rule = type + `:#${color};` + rgba
-    } else if (secondPart === 'opacity' && isNum(thirdPart)) {
-      rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
-    }
-  } else if (secondPart) {
-    let starting = secondPart.slice(0, 3)
-    if (starting.startsWith('#') || includes('rgb!hsl', starting) || includes('transparent!current', secondPart)) {
-      rule = type + ':' + secondPart
+    } else if (secondPart === 'current') {
+      rule = type + ':' + 'currentColor'
     } else {
-      if (secondPart === 'black') {
-        color = '#000'
-      } else if (secondPart === 'white') {
-        color = '#fff'
-      }
-      if (color) {
-        rule = type + ':' + color
-      }
+      rule = type + ':' + rest
     }
   }
 }
@@ -176,6 +244,8 @@ let cls2process = newObject({
       if (isNum(num)) {
         rule = `font-size:${Number(num) - 2}rem`
       }
+    } else if (includes('left!center!right!justify', rest)) {
+      rule = 'text-align:' + rest
     } else {
       setColor('color')
     }
@@ -628,12 +698,17 @@ let negative
 let rule
 let pseudos
 let pseudosRegex = /[^:]+::?|.+/g
+let specialChars = /[.*+\-?^${}()|[\]\\]/g
 
 function processClass () {
   sheet = parentSheet
   rule = ''
   negative = ''
   originalClass = cls
+  let separator = config.separator
+  if (separator !== ':') {
+    cls = cls.replace(new RegExp(separator.replace(specialChars, '\\$&'), 'g'), ':')
+  }
   pseudos = cls.match(pseudosRegex)
   cls = pseudos.pop()
   pseudos = pseudos.map(v => v.endsWith('::') ? '::' + v.slice(0, -2) : ':' + v.slice(0, -1))
@@ -648,6 +723,16 @@ function processClass () {
     negative = '-'
     cls = cls.slice(1)
   }
+
+  if (typeof config.prefix === 'string') {
+    if (!cls.startsWith(config.prefix)) {
+      notFound()
+      return
+    } else {
+      cls = cls.slice(config.prefix.length)
+    }
+  }
+
   parts = cls.split('-')
   partsLength = parts.length
   ;[firstPart, secondPart = '', thirdPart = ''] = parts
@@ -715,19 +800,18 @@ function formatClass () {
 }
 
 function notFound () {
-  if (sheet === parentSheet) {
-    return
-  }
-  for (let s of document.styleSheets) {
+  if (sheet !== parentSheet || pseudos.length > 0) {
+    for (let s of document.styleSheets) {
     // console.log(s)
-    for (let rule of s.cssRules) {
+      for (let rule of [...s.cssRules]) {
       // eslint-disable-next-line no-undef
-      if (rule.type === CSSRule.STYLE_RULE) {
-        if (rule.selectorText.split(',').map((item) => item.trim()).includes('.' + cls)) {
-          cls = originalClass.replace(/[.:]/g, '\\$&')
-          // console.log(`.${cls}${rule.cssText.slice(rule.cssText.indexOf('{'))}`)
-          sheet.insertRule(`.${cls}${rule.cssText.slice(rule.cssText.indexOf('{'))}`, sheet.length)
-          return
+        if (rule.type === CSSRule.STYLE_RULE) {
+          if (rule.selectorText.split(',').map((item) => item.trim()).includes('.' + cls)) {
+            let text = rule.cssText
+            let last = text.lastIndexOf(';')
+            last = last === -1 ? text.lastIndexOf('}') : last
+            setRule(text.slice(text.indexOf('{') + 1, last))
+          }
         }
       }
     }
@@ -741,7 +825,16 @@ let pseudoVendorPrefixes = newObject({
 })
 
 function setRule (t) {
-  cls = originalClass.replace(/[.:()%,#]/g, '\\$&')
+  let ruleCls = componentName || originalClass
+  ruleCls = ruleCls.replace(/[.:()%,#]/g, '\\$&')
+  let important = ''
+  if (config.important) {
+    if (config.important === true) {
+      t = t.replace(/;/g, '!important;') + '!important'
+    } else if (typeof config.important === 'string') {
+      important = config.important + ' '
+    }
+  }
   // console.log(cls)
   if (pseudos.length > 0) {
     for (const pseudo of [...pseudos]) {
@@ -757,20 +850,20 @@ function setRule (t) {
       } else if (includes(':odd!:even', pseudo)) {
         pseudo = `:nth-child(${pseudo.slice(1)})`
       } else if (pseudo.startsWith(':group')) {
-        cls = pseudo.slice(1).replace('-', ':') + ' .' + cls
+        ruleCls = pseudo.slice(1).replace('-', ':') + ' .' + ruleCls
         pseudo = ''
       }
       try {
-        sheet.insertRule(`.${cls}${pseudo}{${t}}`, sheet.length)
+        sheet.insertRule(important + `.${ruleCls}${pseudo}{${t}}`, sheet.length)
       } catch (err) {
-        console.log(err)
+        // console.log(err)
       }
     }
   } else {
     try {
-      sheet.insertRule(`.${cls}{${t}}`, sheet.length)
+      sheet.insertRule(important + `.${ruleCls}{${t}}`, sheet.length)
     } catch (err) {
-      console.log(err)
+      // console.log(err)
     }
   }
 }
