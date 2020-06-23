@@ -11,6 +11,8 @@ const { body, div, p, ul, li, input, span, button } = builders((type, props, ...
 component('myclass', 'ml-10 rounded mt-10 text-green-500 hover:bg-white bg-black border-10 border-green-800')
 
 component('mfun', 'mt-1', 'margin-left:500px')
+// component('ml-4', null, 'margin-left:500px')
+component('ml-4', 'ml-200')
 
 // component('myclass', 'ml-10 rounded')
 
@@ -60,7 +62,7 @@ const app =
       div.class`group-focus:text-gray-500``three`,
       div.class```four`
     ),
-    button.class`mt-8 ml-8 group button`(
+    button.class`ml-4`(
       span.class`group-focus:text-gray-500``three`
     ),
     div.class`focus-within:text-green-500 border`(

@@ -29,6 +29,7 @@ export let component = (name, classes, props) => {
   if (props && typeof props === 'string') {
     setRule(props)
   }
+  classesCache.set(componentName, true)
   componentName = ''
 }
 
@@ -717,6 +718,12 @@ function processClass () {
     if (mediaQuery) {
       sheet = mediaQuery
       pseudos.shift()
+    }
+    if (classesCache.has(cls)) {
+      if (cls[0] === '-') {
+        negative = '-'
+      }
+      notFound()
     }
   }
   if (cls[0] === '-') {
