@@ -19,6 +19,9 @@ export let component = (name, classes, props) => {
     throw Error('Component must have a name.')
   }
   componentName = name.trim()
+  if (customCache.get(componentName)) {
+    throw Error(`Component '${componentName}' was already created.`)
+  }
   if (typeof classes === 'string') {
     for (cls of classes = classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
       processClass()
@@ -98,7 +101,7 @@ let setMedia = (prefix, size) => {
 let cls
 let originalClass
 
-export let processClasses = (classes) => {
+let processClasses = (classes) => {
   if (!addedScreens) {
     addedScreens = true
     let entries = Object.entries(config.screens)
@@ -121,6 +124,7 @@ export let processClasses = (classes) => {
     classesCache.set(classes, true)
   }
 }
+export default processClasses
 
 let formatters = newObject({
   p: 'padding',

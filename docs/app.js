@@ -1,3 +1,5 @@
+/* global CSSRule */
+
 // First Part
 import builders from 'https://unpkg.com/webscript@^0/dist/webscript.modern.js'
 import createDOMElement from 'https://unpkg.com/webscript@^0/dist/createDOMElement.modern.js'
