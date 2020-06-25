@@ -1,6 +1,6 @@
 {
   "name": "runcss",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A utility-first CSS runtime for rapid UI development.",
   "main": "dist/runcss.js",
   "scripts": {
