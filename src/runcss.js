@@ -8,6 +8,7 @@ let includes = (s, v) => split(s).includes(v)
 let ifRemTo = (v) => isNum(v) ? negative + Number(v) * 0.25 + 'rem' : negative + v
 let newObject = (o = {}) => Object.assign(Object.create(null), o)
 let classesCache = new Map()
+let customCache = new Map()
 let parentSheet
 let config = newObject({ separator: ':', screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px' } })
 let componentName
@@ -28,6 +29,7 @@ export let component = (name, classes, props) => {
     setRule(props)
   }
   classesCache.set(componentName, true)
+  customCache.set(componentName, true)
   componentName = ''
 }
 
@@ -732,6 +734,10 @@ function processClass () {
   pseudos = cls.match(pseudosRegex)
   cls = pseudos.pop()
   pseudos = pseudos.map(v => v.endsWith('::') ? '::' + v.slice(0, -2) : ':' + v.slice(0, -1))
+  if (pseudos.length > 0 && customCache.get(cls)) {
+    notFound()
+    return
+  }
 
   if (cls[0] === '-') {
     negative = '-'
