@@ -1,29 +1,60 @@
-import builders from 'https://cdn.jsdelivr.net/npm/webscript@0.2.0/dist/webscript.modern.js'
-import createDOMElement from 'https://cdn.jsdelivr.net/npm/webscript@0.2.0/dist/createDOMElement.modern.js'
+// First Part
+import builders from 'https://unpkg.com/webscript@^0/dist/webscript.modern.js'
+import createDOMElement from 'https://unpkg.com/webscript@^0/dist/createDOMElement.modern.js'
 import { processClasses, component } from '../src/runcss.js'
+
+// Second Part
+function createElement (type, props, ...children) {
+  if (props.class) {
+    processClasses(props.class)
+  }
+  return createDOMElement(type, props, ...children)
+}
+
+// Third Part
+const { div, img, h2 } = builders(createElement)
+
+// Fourth Part
+const example = div.class`md:flex bg-white rounded-lg p-6`(
+  img.class`h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6`.src`./avatar.jpg`,
+  div.class`text-center md:text-left`(
+    h2.class`text-lg``Erin Lindford`,
+    div.class`text-purple-500``Customer Support`,
+    div.class`text-gray-600``erinlindford@example.com`,
+    div.class`text-gray-600``(555) 765-4321`))
+
+// console.log(document.styleSheets[0].selectorText + ':' + document.styleSheets[0].cssText)
+const { body, p, ul, li, input, span, button } = builders(createElement)
+
+/*
 const { body, div, p, ul, li, input, span, button } = builders((type, props, ...children) => {
   if (props.class) {
     processClasses(props.class, { important: false, separator: ':' })
   }
   return createDOMElement(type, props, ...children)
 })
+*/
 
-component('myclass', 'ml-10 rounded mt-10 text-green-500 hover:bg-white bg-black border-10 border-green-800')
+// component('myclass', 'ml-10 rounded mt-10 text-green-500 hover:bg-white bg-black border-10 border-green-800')
 
-component('mfun', 'mt-1', 'margin-left:500px')
+// component('mfun', 'mt-1', 'margin-left:500px')
 // component('ml-4', null, 'margin-left:500px')
-component('ml-4', 'ml-200')
+// component('ml-4', 'ml-200')
 
-// component('myclass', 'ml-10 rounded')
+component('myclass', 'ml-10 rounded-lg pl-10 bg-blue px-5')
 
 const app =
   div.id`app`.class``(
+    div.class`w-20 h-30 border-5 overflow-hidden overflow-x-scroll transition-shadow transition-colors`('hellothere Howareyou NICE TO KNOW now and forever'),
+    div.class`container mx-auto border xl:border-5 xl:ml-2`(
+      example
+    ),
     ul(
       li.class`pl-1.9em lg:pl-100 tracking-widest``hello`,
       li.class`mt-30 text-pink-700 text-opacity-25``Great`,
       li.class`px-50 lg:hidden``fine`,
       li.class`px-5 text-pink-700``Another little test`,
-      li.class`space-x-reverse space-x-4 flex flex-row-reverse hover:nickwhat`(
+      li.class`space-x-reverse space-x-4 flex flex-row-reverse bg-red rounded-t-none rounded-10px lg:rounded-tl-25px mx-5 `(
         p`Interesting`,
         p`Indeed`,
         p`Who told you?`
@@ -42,7 +73,7 @@ const app =
       div.class`text-center bg-goldenrod``1`,
       div.class`text-center bg-rgba(100,200,10,0.5)``2`,
       div.class`text-center bg-activetext``3`),
-    div.class`myclass``Transform`,
+    div.class`xl:myclass``Transform`,
     div.class`ml-10 mt-10 transform rotate-10 scale-x-50 text-orange``Transform Again`,
     div(
       div.class`first:bg-yellow-600``one`,
@@ -51,7 +82,7 @@ const app =
       div.class`last:bg-yellow-600``four`
     ),
     div.class`mt-8`(
-      div.class`hover:nickwhat``one`,
+      div.class`md:nickwhat``one`,
       div.class`even:bg-orange-600``two`,
       div.class`odd:bg-orange-600``three`,
       div.class`odd:bg-orange-600``four`
@@ -72,3 +103,7 @@ const app =
   )
 
 document.body = body(app)
+
+for (const rule of document.styleSheets[0].cssRules) {
+  if (rule.type === CSSRule.MEDIA_RULE) { console.log(rule.cssText) }
+}

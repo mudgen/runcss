@@ -6,13 +6,12 @@ let split = (s) => s.split('!')
 let indexOf = (s, v) => split(s).indexOf(v)
 let includes = (s, v) => split(s).includes(v)
 let ifRemTo = (v) => isNum(v) ? negative + Number(v) * 0.25 + 'rem' : negative + v
-let newObject = (o) => Object.assign(Object.create(null), o)
-let elementClassesCache = new Map()
+let newObject = (o = {}) => Object.assign(Object.create(null), o)
 let classesCache = new Map()
-let sheet
 let parentSheet
-let config = newObject({ separator: ':' })
+let config = newObject({ separator: ':', screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px' } })
 let componentName
+let addedScreens
 
 export let component = (name, classes, props) => {
   if (!name || typeof name !== 'string') {
@@ -24,7 +23,6 @@ export let component = (name, classes, props) => {
       processClass()
     }
   }
-  sheet = parentSheet
   pseudos = []
   if (props && typeof props === 'string') {
     setRule(props)
@@ -54,9 +52,9 @@ let errorNotObject = value => {
   }
 }
 
-let customColors = new Map([['black', '000000'], ['white', 'ffffff']])
+let customColors = new Map()
 
-export let configure = (conf = {}) => {
+export let configure = (conf = newObject()) => {
   for (let s of split('separator!prefix')) {
     if (conf[s] !== undefined && typeof conf[s] !== 'string') {
       throw Error(`config.${s} must be a string.`)
@@ -64,10 +62,8 @@ export let configure = (conf = {}) => {
   }
   if (conf.screens) {
     errorNotObject(conf.screen)
-    for (const [prefix, size] of Object.entries(conf.screens)) {
-      setMedia(prefix, size)
-    }
-  } else if (conf.colors) {
+  }
+  if (conf.colors) {
     errorNotObject(conf.colors)
     for (let [key1, value1] of Object.entries(conf.colors)) {
       if (isObject(value1)) {
@@ -90,27 +86,37 @@ if (document.styleSheets.length === 0) {
 }
 
 let media = new Map()
-let setMedia = (prefix, size) => media.set(prefix, parentSheet.cssRules[parentSheet.insertRule(`@media(min-width:${size}){}`, parentSheet.cssRules.length)])
-
-for (let a of split('sm|640px!md|768px!lg|1024px!xl|1280px')) {
-  setMedia(...a.split('|'))
+let setMedia = (prefix, size) => {
+  let condition = size ? `(min-width:${size})` : ''
+  for (let i = 0; i < 3; i++) {
+    media.set(prefix + i, parentSheet.cssRules[parentSheet.insertRule(`@media${condition}{}`, parentSheet.cssRules.length)])
+  }
 }
 
 let cls
 let originalClass
 
 export let processClasses = (classes) => {
-  classes = classes.trim()
-  if (elementClassesCache.has(classes)) {
-    return
-  }
-  elementClassesCache.set(classes, true)
-  for (cls of classes.replace(/\s\s+/g, ' ').split(' ')) {
-    if (classesCache.has(cls)) {
-      continue
+  if (!addedScreens) {
+    addedScreens = true
+    let entries = Object.entries(config.screens)
+    for (const m of split('custom!default')) {
+      setMedia(m)
+      for (const [key, size] of entries) {
+        setMedia(m + key, size)
+      }
     }
-    classesCache.set(cls, true)
-    processClass()
+  }
+  classes = classes.trim()
+  if (!classesCache.has(classes)) {
+    for (cls of classes.replace(/\s\s+/g, ' ').split(' ')) {
+      if (classesCache.has(cls)) {
+        continue
+      }
+      classesCache.set(cls, true)
+      processClass()
+    }
+    classesCache.set(classes, true)
   }
 }
 
@@ -122,7 +128,7 @@ let formatters = newObject({
   w: 'width'
 })
 
-let classNames = newObject({})
+let classNames = newObject()
 
 // direct map from class to values
 for (let c of split('box-border|-webkit-box-sizing:border-box;box-sizing:border-box!box-content|-webkit-box-sizing:content-box;box-sizing:content-box!hidden|display:none!object-scale-down|object-fit:scale-down;-o-object-fit:scale-down!scrolling-touch|-webkit-overflow-scrolling:touch!scrolling-auto|-webkit-overflow-scrolling:auto!visible|visibility:visible!invisible|visibility:hidden!order-first|order:-9999!order-last|order:9999!order-none|order:0!grid-cols-none|grid-template-columns:none!col-auto|grid-column:auto!col-start-auto|-ms-grid-column:auto;grid-column-start:auto!col-end-auto|-ms-grid-column-span:auto;grid-column-end:auto!grid-rows-none|-ms-grid-rows:none;grid-template-rows:none!row-auto|grid-row:auto!row-start-auto|-ms-grid-row:auto;grid-row-start:auto!row-end-auto|-ms-grid-row-span:auto;grid-row-end:auto!gap-px|gap:1px!row-gap-px|row-gap:1px!grid-flow-row|grid-auto-flow:row!grid-flow-col|grid-auto-flow:column!grid-flow-row-dense|grid-auto-flow:row dense!grid-flow-col-dense|grid-auto-flow:column dense!min-w-full|min-width:100%!max-w-full|max-width:100%!max-w-screen-sm|max-width:640px!max-w-screen-md|max-width:768px!max-w-screen-lg|max-width:1024px!max-w-screen-xl|max-width:1280px!max-w-none|max-width:none!min-h-full|min-height:100%!min-h-screen|min-height:100vh!max-h-full|max-height:100%!max-h-screen|max-height:100vh!text-2xl|font-size:1.5rem!text-3xl|font-size:1.875rem!text-4xl|font-size:2.25rem!underline|text-decoration:underline!line-through|text-decoration:line-through!no-underline|text-decoration:none!uppercase|text-transform:uppercase!lowercase|text-transform:lowercase!capitalize|text-transform:capitalize!normal-case|text-transform:none!whitespace-no-wrap|white-space:nowrap!break-normal|word-break:normal;overflow-wrap:normal!break-words|overflow-wrap:break-word!break-all|word-break:break-all!truncate|overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap!h-auto|height:auto!max-w-2xl|max-width:42rem!tracking-tighter|letter-spacing:-0.05em!tracking-tight|letter-spacing:-0.025em!tracking-normal|0!tracking-wide:letter-spacing:0.025em!tracking-wider|letter-spacing:0.05em!tracking-widest|letter-spacing: 0.1em!leading-none|line-height:1!leading-tight|line-height:1.25!leading-snug|line-height:1.375!leading-normal|line-height:1.5!leading-relaxed|line-height:1.625!leading-loose|line-height:2!list-none|list-style-type:none!list-disc|list-style-type:disc!list-decimal|list-style-type:decimal!list-inside|list-style-position:inside!list-outside|list-style-position:outside!border|border-width:1px!border-collapse|border-collapse:collapse!border-separate|border-collapse:separate!table-auto|table-layout:auto!table-fixed|table-layout:fixed!appearance-none|-webkit-appearance:none;-moz-appearance:none;appearance:none!outline-none|outline:0!resize-none|resize:none!resize|resize:both!resize-y|resize:vertical!resize-x|resize:horizontal!fill-current|fill:currentColor!stroke-current|stroke:currentColor!sr-only|position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0!not-sr-only|position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal!font-sans|font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji!font-serif|font-family:Georgia,Cambria,"Times New Roman",Times,serif!font-mono|font-family:Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!sticky|position:-webkit-sticky;position:sticky')) {
@@ -190,9 +196,10 @@ let setColor = (type) => {
 }
 
 let setPosition = () => {
-  if (includes('auto!initial!inherit', lastPart) && !isStartNum(lastPart)) {
+  if (!fourthPart && (includes('auto!initial!inherit', lastPart) || isStartNum(lastPart))) {
     let v = negative + lastPart
     if (thirdPart) {
+      sheetLevel = 1
       if (secondPart === 'y') {
         rule = `top:${v};bottom:` + v
       } else if (secondPart === 'x') {
@@ -202,6 +209,7 @@ let setPosition = () => {
       if (firstPart === 'inset') {
         rule = `top:${v};right:${v};bottom:${v};left:` + v
       } else {
+        sheetLevel = 2
         rule = firstPart + ':' + v
       }
     }
@@ -230,6 +238,9 @@ let cls2process = newObject({
     }
   },
   overflow: () => {
+    if (includes('x!y', secondPart)) {
+      sheetLevel = 1
+    }
     rule = partsWithoutEnd + ':' + lastPart
   },
   clearfix: () => {
@@ -280,6 +291,7 @@ let cls2process = newObject({
       }
       rule = `-ms-flex-wrap:${rest};flex-wrap:${rest}`
     } else if (includes('grow!shrink', secondPart)) {
+      sheetLevel = 1
       let v = thirdPart || 1
       if (secondPart === 'grow') {
         rule = `-webkit-box-flex:${v};-ms-flex-positive:${v};flex-grow:${v}`
@@ -292,8 +304,8 @@ let cls2process = newObject({
       rule = ruleFunc(1, 1, 'auto')
     } else if (rest === 'none') {
       rule = '-webkit-box-flex:0;-ms-flex:none;flex:none'
-    } else if (partsLength === 4) {
-      rule = ruleFunc(secondPart, thirdPart, parts[3])
+    } else if (fourthPart) {
+      rule = ruleFunc(secondPart, thirdPart, fourthPart)
     } else if (thirdPart) {
       rule = ruleFunc(secondPart, thirdPart)
     } else {
@@ -367,7 +379,8 @@ let cls2process = newObject({
   },
   divide: () => {
     pseudos = ['>:not(template)~:not(template)']
-    if (partsLength < 4) {
+    sheetLevel = 1
+    if (!fourthPart) {
       let v
       if (isNum(thirdPart)) {
         v = thirdPart + 'px'
@@ -470,10 +483,13 @@ let cls2process = newObject({
       if (!secondPart || (!thirdPart && pos > -1)) {
         rule = 'border-radius:' + v
       } else if (includes('t!b', secondPart)) {
+        sheetLevel = 1
         rule = `border-${place1}-left-radius:${v};border-${place1}-right-radius:` + v
       } else if (includes('l!r', secondPart)) {
+        sheetLevel = 1
         rule = `border-top-${place1}-radius:${v};border-bottom-${place1}-radius:` + v
       } else {
+        sheetLevel = 2
         rule = `border-${place1}-${edge[secondPart[1]]}-radius:` + v
       }
     }
@@ -482,6 +498,7 @@ let cls2process = newObject({
     let b = edge[secondPart]
     if (thirdPart && b) {
       if (isNum(thirdPart)) {
+        sheetLevel = 1
         rule = `border-${b}-width:${thirdPart}px`
       } else if (isStartNum(thirdPart)) {
         rule = `border-${b}-width:` + thirdPart
@@ -490,6 +507,7 @@ let cls2process = newObject({
       if (includes('solid!dashed!dotted!double!none', secondPart)) {
         rule = 'border-style:' + secondPart
       } else if (b) {
+        sheetLevel = 1
         rule = `border-${b}-width:1px`
       } else if (isNum(secondPart)) {
         rule = `border-width:${secondPart}px`
@@ -539,6 +557,7 @@ let cls2process = newObject({
     if (isNum(lastPart)) {
       let v = lastPart / 100
       if (includes('x!y', secondPart)) {
+        sheetLevel = 1
         rule = `--transform-scale-${secondPart}:` + v
       } else {
         rule = `--transform-scale-x:${v};--transform-scale-y:` + v
@@ -637,13 +656,13 @@ let cls2process = newObject({
   },
   items: () => {
     if (includes('stretch!start!center!end!baseline', rest)) {
-      rule = `-webkit-box-align:${rest};-ms-flex-align:${rest};align-items:` + (includes('start,end', rest) ? 'flex-' : '') + rest
+      rule = `-webkit-box-align:${rest};-ms-flex-align:${rest};align-items:` + (includes('start!end', rest) ? 'flex-' : '') + rest
     }
   },
   content: () => {
     if (includes('start!center!end!between!around')) {
       let v = rest
-      if (includes('start,end', rest)) {
+      if (includes('start!end', rest)) {
         rest = 'flex-' + rest
       } else if (rest === 'between') {
         v = 'justify'
@@ -687,22 +706,22 @@ let cls2process = newObject({
   }
 })
 
-let parts
 let firstPart // first  part
 let secondPart // second part
 let thirdPart // third part
+let fourthPart
 let lastPart // last part
 let partsWithoutEnd // without end
 let rest
-let partsLength // parts.length
 let negative
 let rule
 let pseudos
 let pseudosRegex = /[^:]+::?|.+/g
 let specialChars = /[.*+\-?^${}()|[\]\\]/g
+let sheetLevel
 
 function processClass () {
-  sheet = parentSheet
+  sheetLevel = 0
   rule = ''
   negative = ''
   originalClass = cls
@@ -713,19 +732,7 @@ function processClass () {
   pseudos = cls.match(pseudosRegex)
   cls = pseudos.pop()
   pseudos = pseudos.map(v => v.endsWith('::') ? '::' + v.slice(0, -2) : ':' + v.slice(0, -1))
-  if (pseudos.length > 0) {
-    let mediaQuery = media.get(pseudos[0].slice(1))
-    if (mediaQuery) {
-      sheet = mediaQuery
-      pseudos.shift()
-    }
-    if (classesCache.has(cls)) {
-      if (cls[0] === '-') {
-        negative = '-'
-      }
-      notFound()
-    }
-  }
+
   if (cls[0] === '-') {
     negative = '-'
     cls = cls.slice(1)
@@ -740,17 +747,16 @@ function processClass () {
     }
   }
 
-  parts = cls.split('-')
-  partsLength = parts.length
-  ;[firstPart, secondPart = '', thirdPart = ''] = parts
-  lastPart = parts[partsLength - 1]
+  let parts = cls.split('-')
+  ;[firstPart, secondPart = '', thirdPart = '', fourthPart = ''] = parts
+  lastPart = parts[parts.length - 1]
   partsWithoutEnd = parts.slice(0, -1).join('-')
   rest = parts.slice(1).join('-')
 
   let process
   if (!(rule = classNames[cls]) && (process = cls2process[firstPart])) {
     process()
-  } else if (firstPart.length < 3) {
+  } else if (firstPart.length < 3 && !thirdPart) {
     formatClass()
   }
 
@@ -758,11 +764,9 @@ function processClass () {
     setRule(rule)
   } else if (cls === 'container') {
     setRule('width:100%')
-    let m = split('640px!768px!1024px!1280px')
-    media.values().forEach((s, index) => {
-      sheet = s
-      setRule('max-width:' + m[index])
-    })
+    for (const [r, size] of Object.entries(config.screens)) {
+      setRule('max-width:' + size, media.get(`default${r}0`))
+    }
   } else {
     notFound()
   }
@@ -780,6 +784,8 @@ function formatClass () {
     } else if (firstPart === 'h') {
       v = '100vh'
     }
+  } else if (secondPart === 'auto') {
+    v = 'auto'
   } else if (isNum(secondPart)) {
     v = negative + Number(secondPart) * 0.25 + 'rem'
   } else if (secondPart.indexOf('/') > -1) {
@@ -795,10 +801,13 @@ function formatClass () {
   let e = edge[firstPart[1]]
   if (v && basicPart) {
     if (firstPart[1] === 'x') {
+      sheetLevel = 1
       rule = basicPart + `-right:${v};${basicPart}-left:` + v
     } else if (firstPart[1] === 'y') {
+      sheetLevel = 1
       rule = basicPart + `-top:${v};${basicPart}-bottom:` + v
     } else if (e) {
+      sheetLevel = 2
       rule = basicPart + `-${e}:` + v
     } else {
       rule = basicPart + ':' + v
@@ -806,20 +815,54 @@ function formatClass () {
   }
 }
 
-function notFound () {
-  if (sheet !== parentSheet || pseudos.length > 0) {
-    for (let s of document.styleSheets) {
-    // console.log(s)
-      for (let rule of [...s.cssRules]) {
+let findInSheet = (sheet) => {
+  let rules = []
+  for (let rule of [...sheet.cssRules]) {
+    // eslint-disable-next-line no-undef
+    if (rule.type === CSSRule.STYLE_RULE) {
+      if (rule.selectorText.split(',').map((item) => item.trim()).includes('.' + cls)) {
+        let text = rule.cssText
+        rules.push([text.slice(text.indexOf('{') + 1, text.lastIndexOf('}')), sheet])
+      }
       // eslint-disable-next-line no-undef
-        if (rule.type === CSSRule.STYLE_RULE) {
-          if (rule.selectorText.split(',').map((item) => item.trim()).includes('.' + cls)) {
-            let text = rule.cssText
-            let last = text.lastIndexOf(';')
-            last = last === -1 ? text.lastIndexOf('}') : last
-            setRule(text.slice(text.indexOf('{') + 1, last))
+    } else if (rule.type === CSSRule.MEDIA_RULE) {
+      rules.push(...findInSheet(rule))
+    }
+  }
+  return rules
+}
+
+let responsiveSheets = new Map()
+
+let notFound = () => {
+  if (pseudos.length > 0) {
+    let rules = []
+    for (const sheet of document.styleSheets) {
+      rules.push(...findInSheet(sheet))
+    }
+    let responsive = pseudos[0].slice(1)
+    if (config.screens[responsive]) {
+      let customSheets = [0, 1, 2].map((v) => media.get('custom' + v))
+      let screens = Object.entries(config.screens)
+      for (let [rule, sheet] of rules) {
+        let customIndex = customSheets.indexOf(sheet)
+        if (customIndex > -1) {
+          setRule(rule, media.get('custom' + responsive + customIndex))
+        } else {
+          let sheets = responsiveSheets.get(sheet)
+          if (!sheets) {
+            sheets = newObject()
+            for (const [r, size] of screens) {
+              sheets[r] = sheet.cssRules[sheet.insertRule(`@media(min-width:${size}){}`, sheet.cssRules.length)]
+            }
+            responsiveSheets[sheet] = sheets
           }
+          setRule(rule, sheets[responsive])
         }
+      }
+    } else {
+      for (let [rule, sheet] of rules) {
+        setRule(rule, sheet)
       }
     }
   }
@@ -831,18 +874,42 @@ let pseudoVendorPrefixes = newObject({
   '::selection': ':::-moz-selection'
 })
 
-function setRule (t) {
-  let ruleCls = componentName || originalClass
-  ruleCls = ruleCls.replace(/[.:()%,#]/g, '\\$&')
+function setRule (rule, sheet) {
+  let pseudo = ''
+  let ruleCls = originalClass
+  let sheetPrefix = 'default'
   let important = ''
+  let insertRule = () => {
+    try {
+      sheet.insertRule(important + `.${ruleCls}${pseudo}{${rule}}`, sheet.cssRules.length)
+    } catch (err) {
+      // console.log(err)
+    }
+  }
+
+  if (componentName) {
+    ruleCls = componentName
+    sheetPrefix = 'custom'
+  }
+  ruleCls = ruleCls.replace(/[.:()%,#]/g, '\\$&')
   if (config.important) {
     if (config.important === true) {
-      t = t.replace(/;/g, '!important;') + '!important'
+      rule = rule.replace(/;/g, '!important;') + '!important'
     } else if (typeof config.important === 'string') {
       important = config.important + ' '
     }
   }
-  // console.log(cls)
+
+  if (pseudos.length > 0) {
+    let mediaQuery = media.get(sheetPrefix + pseudos[0].slice(1) + sheetLevel)
+    if (mediaQuery) {
+      sheet = sheet || mediaQuery
+      pseudos.shift()
+    }
+  } else if (!sheet) {
+    sheet = media.get(sheetPrefix + sheetLevel)
+  }
+
   if (pseudos.length > 0) {
     for (const pseudo of [...pseudos]) {
       let prefixes = pseudoVendorPrefixes[pseudo]
@@ -850,7 +917,7 @@ function setRule (t) {
         pseudos.push(...split(prefixes))
       }
     }
-    for (let pseudo of pseudos) {
+    for (pseudo of pseudos) {
       // console.log(`.${cls}${pseudo}{${t}}`)
       if (includes(':first!:last', pseudo)) {
         pseudo = pseudo + '-child'
@@ -860,17 +927,9 @@ function setRule (t) {
         ruleCls = pseudo.slice(1).replace('-', ':') + ' .' + ruleCls
         pseudo = ''
       }
-      try {
-        sheet.insertRule(important + `.${ruleCls}${pseudo}{${t}}`, sheet.length)
-      } catch (err) {
-        // console.log(err)
-      }
+      insertRule()
     }
   } else {
-    try {
-      sheet.insertRule(important + `.${ruleCls}{${t}}`, sheet.length)
-    } catch (err) {
-      // console.log(err)
-    }
+    insertRule()
   }
 }
