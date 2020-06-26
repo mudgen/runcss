@@ -3,8 +3,27 @@
 // First Part
 import builders from 'https://unpkg.com/webscript@^0/dist/webscript.modern.js'
 import createDOMElement from 'https://unpkg.com/webscript@^0/dist/createDOMElement.modern.js'
-import { processClasses, component } from '../src/runcss.js'
+import processClasses, { component, configure } from '../src/runcss.js'
+/*
+configure({
+  colors: {
+    blue: '#ff0000',
+    banana: {
+      100: '#FFFFF0',
+      200: '#FEFCBF',
+      300: '#FAF089'
+    }
+  }
+})
 
+configure({
+  screens: {
+    watch: '300px',
+    phone: '340px',
+    tablet: '640px'
+  }
+})
+*/
 // Second Part
 function createElement (type, props, ...children) {
   if (props.class) {
@@ -17,13 +36,14 @@ function createElement (type, props, ...children) {
 const { div, img, h2 } = builders(createElement)
 
 // Fourth Part
-const example = div.class`md:flex bg-white rounded-lg p-6`(
-  img.class`h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6`.src`./avatar.jpg`,
-  div.class`text-center md:text-left`(
-    h2.class`text-lg``Erin Lindford`,
-    div.class`text-purple-500``Customer Support`,
-    div.class`text-gray-600``erinlindford@example.com`,
-    div.class`text-gray-600``(555) 765-4321`))
+const card =
+  div.class`md:flex bg-white rounded-lg p-6`(
+    img.class`h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6`.src`./avatar.jpg`,
+    div.class`text-center md:text-left`(
+      h2.class`text-lg``Erin Lindford`,
+      div.class`text-purple-500``Customer Support`,
+      div.class`text-gray-600``erinlindford@example.com`,
+      div.class`text-gray-600``(555) 765-4321`))
 
 // console.log(document.styleSheets[0].selectorText + ':' + document.styleSheets[0].cssText)
 const { body, p, ul, li, input, span, button } = builders(createElement)
@@ -37,19 +57,26 @@ const { body, div, p, ul, li, input, span, button } = builders((type, props, ...
 })
 */
 
-// component('myclass', 'ml-10 rounded mt-10 text-green-500 hover:bg-white bg-black border-10 border-green-800')
+component(
+  'btn',
+  'p-2 rounded bg-blue hover:text-green-500 text-base lg:text-lg',
+  'box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5);outline: none;'
+)
 
 // component('mfun', 'mt-1', 'margin-left:500px')
-component('ml-4', null, 'margin-left:500px')
+// component('ml-4', null, 'margin-left:500px')
 // component('ml-4', 'ml-200')
 
-component('myclass', 'ml-10 rounded-lg pl-10 bg-blue px-5')
+// component('myclass', 'ml-10 rounded-lg pl-10 bg-blue px-5')
 
 const app =
-  div.id`app`.class``(
-    div.class`w-20 h-30 border-5 overflow-hidden overflow-x-scroll transition-shadow transition-colors`('hellothere Howareyou NICE TO KNOW now and forever'),
-    div.class`container mx-auto border xl:border-5 xl:ml-2`(
-      example
+  div.id`app`.class`mt-5 ml-1.7rem`(
+    div.class``(
+      button.class`btn text-yellow``Click Me`,
+      button.class`xl:btn text-green``Click Me`
+    ),
+    div.class`container mx-auto border xl:border-5`(
+      card
     ),
     ul(
       li.class`pl-1.9em lg:pl-100 tracking-widest``hello`,

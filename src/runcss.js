@@ -15,25 +15,14 @@ let componentName
 let addedScreens
 
 export let component = (name, classes, props) => {
-  if (!name || typeof name !== 'string') {
+  if (typeof name !== 'string') {
     throw Error('Component must have a name.')
   }
-  componentName = name.trim()
-  if (customCache.get(componentName)) {
-    throw Error(`Component '${componentName}' was already created.`)
+  name = name.trim()
+  if (classesCache.get(name)) {
+    throw Error(`Class '${name}' was already processed.`)
   }
-  if (typeof classes === 'string') {
-    for (cls of classes = classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
-      processClass()
-    }
-  }
-  pseudos = []
-  if (props && typeof props === 'string') {
-    setRule(props)
-  }
-  classesCache.set(componentName, true)
-  customCache.set(componentName, true)
-  componentName = ''
+  customCache.set(name, [classes, props])
 }
 
 let isObject = value => Object.prototype.toString.call(value) === '[object Object]'
@@ -52,7 +41,7 @@ let hex6 = value => {
 }
 
 let errorNotObject = value => {
-  if (isObject(value)) {
+  if (!isObject(value)) {
     throw Error('Config value must be an object.')
   }
 }
@@ -66,7 +55,7 @@ export let configure = (conf = newObject()) => {
     }
   }
   if (conf.screens) {
-    errorNotObject(conf.screen)
+    errorNotObject(conf.screens)
   }
   if (conf.colors) {
     errorNotObject(conf.colors)
@@ -180,7 +169,11 @@ let setColor = (type) => {
     rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
   } else {
     let color = customColors.get(rest)
-    if (!color) {
+    if (color) {
+      if (thirdPart && isObject(color)) {
+        color = color[thirdPart]
+      }
+    } else {
       if (thirdPart) {
         let colorPos = colorNames.indexOf(secondPart)
         color = colors[colorPos * 9 + (Number(thirdPart[0]) - 1)]
@@ -197,6 +190,7 @@ let setColor = (type) => {
       rule = type + ':' + 'currentColor'
     } else {
       rule = type + ':' + rest
+      // console.log(rule)
     }
   }
 }
@@ -727,6 +721,23 @@ let specialChars = /[.*+\-?^${}()|[\]\\]/g
 let sheetLevel
 
 function processClass () {
+  let customData = customCache.get(cls)
+  if (customData) {
+    let [classes, props] = customData
+    componentName = cls
+    if (typeof classes === 'string') {
+      for (cls of classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
+        processClass()
+      }
+    }
+    pseudos = []
+    if (props && typeof props === 'string') {
+      setRule(props)
+    }
+    customCache.delete(componentName)
+    componentName = ''
+    return
+  }
   sheetLevel = 0
   rule = ''
   negative = ''
@@ -756,7 +767,6 @@ function processClass () {
       cls = cls.slice(config.prefix.length)
     }
   }
-
   let parts = cls.split('-')
   ;[firstPart, secondPart = '', thirdPart = '', fourthPart = ''] = parts
   lastPart = parts[parts.length - 1]
@@ -916,7 +926,9 @@ function setRule (rule, sheet) {
       sheet = sheet || mediaQuery
       pseudos.shift()
     }
-  } else if (!sheet) {
+  }
+
+  if (!sheet) {
     sheet = media.get(sheetPrefix + sheetLevel)
   }
 

@@ -1,9 +1,6 @@
-.nickwhat {
+.myclass {
   margin: 0 10px;
-  background-color: red;
-  border-top-left-radius: 0;
-  border-radius: 0.5rem;
-  
-  
+  background-color: red;  
+  border-radius: 0.5rem; 
 }
 
