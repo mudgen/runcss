@@ -721,23 +721,6 @@ let specialChars = /[.*+\-?^${}()|[\]\\]/g
 let sheetLevel
 
 function processClass () {
-  let customData = customCache.get(cls)
-  if (customData) {
-    let [classes, props] = customData
-    componentName = cls
-    if (typeof classes === 'string') {
-      for (cls of classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
-        processClass()
-      }
-    }
-    pseudos = []
-    if (props && typeof props === 'string') {
-      setRule(props)
-    }
-    customCache.delete(componentName)
-    componentName = ''
-    return
-  }
   sheetLevel = 0
   rule = ''
   negative = ''
@@ -749,8 +732,22 @@ function processClass () {
   pseudos = cls.match(pseudosRegex)
   cls = pseudos.pop()
   pseudos = pseudos.map(v => v.endsWith('::') ? '::' + v.slice(0, -2) : ':' + v.slice(0, -1))
-  if (pseudos.length > 0 && customCache.get(cls)) {
-    notFound()
+  let customData = customCache.get(cls)
+  if (customData) {
+    let [classes, props] = customData
+    let [pseudosStr, originalPseudos] = [originalClass.slice(0, originalClass.lastIndexOf(cls)), pseudos]
+    componentName = originalClass
+    if (typeof classes === 'string') {
+      for (cls of classes.trim().replace(/\s\s+/g, ' ').split(' ')) {
+        cls = pseudosStr + cls
+        processClass()
+      }
+    }
+    pseudos = originalPseudos
+    if (props && typeof props === 'string') {
+      setRule(props)
+    }
+    componentName = ''
     return
   }
 
@@ -862,23 +859,17 @@ let notFound = () => {
     }
     let responsive = pseudos[0].slice(1)
     if (config.screens[responsive]) {
-      let customSheets = [0, 1, 2].map((v) => media.get('custom' + v))
       let screens = Object.entries(config.screens)
       for (let [rule, sheet] of rules) {
-        let customIndex = customSheets.indexOf(sheet)
-        if (customIndex > -1) {
-          setRule(rule, media.get('custom' + responsive + customIndex))
-        } else {
-          let sheets = responsiveSheets.get(sheet)
-          if (!sheets) {
-            sheets = newObject()
-            for (const [r, size] of screens) {
-              sheets[r] = sheet.cssRules[sheet.insertRule(`@media(min-width:${size}){}`, sheet.cssRules.length)]
-            }
-            responsiveSheets[sheet] = sheets
+        let sheets = responsiveSheets.get(sheet)
+        if (!sheets) {
+          sheets = newObject()
+          for (const [r, size] of screens) {
+            sheets[r] = sheet.cssRules[sheet.insertRule(`@media(min-width:${size}){}`, sheet.cssRules.length)]
           }
-          setRule(rule, sheets[responsive])
+          responsiveSheets[sheet] = sheets
         }
+        setRule(rule, sheets[responsive])
       }
     } else {
       for (let [rule, sheet] of rules) {

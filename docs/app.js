@@ -71,9 +71,10 @@ component(
 
 const app =
   div.id`app`.class`mt-5 ml-1.7rem`(
-    div.class``(
-      button.class`btn text-yellow``Click Me`,
-      button.class`xl:btn text-green``Click Me`
+    div.class`lg:myclass`(
+      button.class`xl:btn text-green``Click Me`,
+      button.class`btn text-yellow``Click Me`
+
     ),
     div.class`container mx-auto border xl:border-5`(
       card
