@@ -23,7 +23,10 @@ configure({
     tablet: '640px'
   }
 })
+
 */
+configure({ prefix: 'run-', separator: '&' })
+
 // Second Part
 function createElement (type, props, ...children) {
   if (props.class) {
@@ -59,7 +62,7 @@ const { body, div, p, ul, li, input, span, button } = builders((type, props, ...
 
 component(
   'btn',
-  'p-2 rounded bg-blue hover:text-green-500 text-base lg:text-lg',
+  'r-p-2 r-rounded r-bg-blue hover:r-text-green-500 text-base lg:text-lg',
   'box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5);outline: none;'
 )
 
@@ -71,6 +74,9 @@ component(
 
 const app =
   div.id`app`.class`mt-5 ml-1.7rem`(
+    div.class`run-text-blue hover&run-text-yellow`(
+      p`My test`
+    ),
     div.class`lg:myclass`(
       button.class`xl:btn text-green``Click Me`,
       button.class`btn text-yellow``Click Me`
@@ -80,7 +86,7 @@ const app =
       card
     ),
     ul(
-      li.class`pl-1.9em lg:pl-100 tracking-widest``hello`,
+      li.class`r-pl-1.9em lg:r-pl-100 r-tracking-widest``hello`,
       li.class`mt-30 text-pink-700 text-opacity-25``Great`,
       li.class`px-50 lg:hidden``fine`,
       li.class`px-5 text-pink-700``Another little test`,

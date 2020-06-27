@@ -902,7 +902,7 @@ function setRule (rule, sheet) {
     ruleCls = componentName
     sheetPrefix = 'custom'
   }
-  ruleCls = ruleCls.replace(/[.:()%,#]/g, '\\$&')
+  ruleCls = ruleCls.replace(/[.:()&@~*^$%,#]/g, '\\$&')
   if (config.important) {
     if (config.important === true) {
       rule = rule.replace(/;/g, '!important;') + '!important'
