@@ -67,7 +67,7 @@ Here is a simple example of how to use RunCSS without integration with an existi
 ```html
 <html>
 <head><head>
-<body>
+<body style="display: none;">
   <!-- HTML that uses RunCSS here. -->
   <div class="md:flex bg-white rounded-lg p-6">
     <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg">
@@ -85,6 +85,8 @@ Here is a simple example of how to use RunCSS without integration with an existi
     for(const element of document.querySelectorAll('*[class]')) {    
       processClasses(element.className)
     }  
+    // Display elements
+    document.body.style.display = "block"
   </script>
 </body>
 ```

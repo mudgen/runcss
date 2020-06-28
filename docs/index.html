@@ -23,7 +23,8 @@
   <meta name="theme-color" content="#fafafa">
 </head>
 
-<body>
+<!-- Prevent flash of unstyled elements with display:none -->
+<body style="display:none;">
   <div class="md:flex bg-white rounded-lg p-6">
     <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg">
     <div class="text-center md:text-left">
@@ -37,8 +38,9 @@
     import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
     for(const element of document.querySelectorAll('*[class]')) {    
       processClasses(element.className)
-    }  
+    }
+    // Display elements
+    document.body.style.display = 'block'  
   </script>
 </body>
-
 </html>
