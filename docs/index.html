@@ -16,8 +16,7 @@
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="icon.png">
   <!-- Place favicon.ico in the root directory -->
-
-  <script type="module" src="app.js"></script>
+<!-- <script type="module" src="app.js"></script> -->
   <link rel="stylesheet" href="../src/preflight.css">
   <link rel="stylesheet" href="./test.css">
   
@@ -25,9 +24,21 @@
 </head>
 
 <body>
-
-  <!-- Add your site or application content here -->  
-  
+  <div class="md:flex bg-white rounded-lg p-6">
+    <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg">
+    <div class="text-center md:text-left">
+      <h2 class="text-lg">Erin Lindford</h2>
+      <div class="text-purple-500">Customer Support</div>
+      <div class="text-gray-600">erinlindford@example.com</div>
+      <div class="text-gray-600">(555) 765-4321</div>
+    </div>
+  </div>    
+  <script type="module">
+    import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+    for(const element of document.querySelectorAll('*[class]')) {    
+      processClasses(element.className)
+    }  
+  </script>
 </body>
 
 </html>

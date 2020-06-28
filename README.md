@@ -61,6 +61,35 @@ const card =
 Here is the result of the above code:
 ![Result of above code](https://dev-to-uploads.s3.amazonaws.com/i/zfjfxvjwg96y8njyo5wl.png)
 
+## Using RunCSS Without a Javascript Library
+
+Here is a simple example of how to use RunCSS without integration with an existing Javascript library or framework:
+```html
+<html>
+<head><head>
+<body>
+  <!-- HTML that uses RunCSS here. -->
+  <div class="md:flex bg-white rounded-lg p-6">
+    <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg">
+    <div class="text-center md:text-left">
+      <h2 class="text-lg">Erin Lindford</h2>
+      <div class="text-purple-500">Customer Support</div>
+      <div class="text-gray-600">erinlindford@example.com</div>
+      <div class="text-gray-600">(555) 765-4321</div>
+    </div>
+  </div>    
+  <!-- This code generates all the CSS needed for the webpage. -->
+  <script type="module">
+    import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+    // Get all elements that have a class attribute.
+    for(const element of document.querySelectorAll('*[class]')) {    
+      processClasses(element.className)
+    }  
+  </script>
+</body>
+```
+
+
 ## RunCSS File Size
 
 [runcss.modern.js](https://github.com/mudgen/runcss/blob/master/dist/runcss.modern.js) is 8kb compressed and 20kb raw. It has no dependencies.
