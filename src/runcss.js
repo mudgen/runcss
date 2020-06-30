@@ -606,25 +606,24 @@ let cls2process = newObject({
       rule = 'cursor:' + rest
     }
   },
-  box: () => {
-    if (secondPart === 'shadow') {
-      let shadows = newObject({
-        xs: '0 0 0 1pxR.05)',
-        sm: '0 1px 2px 0R.05)',
-        '': '0 1px 3px 0R.1), 0 1px 2px 0R.06)',
-        md: '0 4px 6px -1pxR.1), 0 2px 4px -1pxR.06)',
-        lg: '0 10px 15px -3pxR.1), 0 4px 6px -2pxR.05)',
-        xl: '0 20px 25px -5pxR.1), 0 10px 10px -5pxR.04)',
-        '2xl': '0 25px 50px -12pxR.25)',
-        inner: 'inset 0 2px 4px 0R.06)',
-        outline: '0 0 0 3px rgba(66, 153, 225, 0.5)',
-        none: 'none'
-      })
-      let v = shadows[thirdPart]
-      if (v) {
-        v = v.replace(/R/g, ' rgba(0, 0, 0, 0')
-        rule = `-webkit-box-shadow:${v};box-shadow:` + v
-      }
+  shadow: () => {
+    let shadows = newObject({
+      xs: '0 0 0 1pxR.05)',
+      sm: '0 1px 2px 0R.05)',
+      '': '0 1px 3px 0R.1), 0 1px 2px 0R.06)',
+      md: '0 4px 6px -1pxR.1), 0 2px 4px -1pxR.06)',
+      lg: '0 10px 15px -3pxR.1), 0 4px 6px -2pxR.05)',
+      xl: '0 20px 25px -5pxR.1), 0 10px 10px -5pxR.04)',
+      '2xl': '0 25px 50px -12pxR.25)',
+      inner: 'inset 0 2px 4px 0R.06)',
+      outline: '0 0 0 3px rgba(66, 153, 225, 0.5)',
+      none: 'none'
+    })
+    let v = shadows[secondPart]
+    if (v) {
+      v = v.replace(/R/g, ' rgba(0, 0, 0, 0')
+      console.log(v)
+      rule = `-webkit-box-shadow:${v};box-shadow:` + v
     }
   },
   outline: () => {
