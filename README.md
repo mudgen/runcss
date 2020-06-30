@@ -307,11 +307,6 @@ RunCSS is another tool that's part of the No Build Movement.
 
 The No Build Movement is a change in web development that favors building web applications without build tools except for minification of resources.
 
-## Project Home
-
-The RunCSS project can be found here:
-{% github mudgen/runcss %}
-
 [Follow me on twitter.](https://twitter.com/mudgen)
 
 

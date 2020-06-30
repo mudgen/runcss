@@ -101,16 +101,18 @@ let processClasses = (classes) => {
       }
     }
   }
-  classes = classes.trim()
-  if (!classesCache.has(classes)) {
-    for (cls of classes.replace(/\s\s+/g, ' ').split(' ')) {
-      if (classesCache.has(cls)) {
-        continue
+  if (typeof classes === 'string') {
+    classes = classes.trim()
+    if (!classesCache.has(classes)) {
+      for (cls of classes.replace(/\s\s+/g, ' ').split(' ')) {
+        if (classesCache.has(cls)) {
+          continue
+        }
+        classesCache.set(cls, true)
+        processClass()
       }
-      classesCache.set(cls, true)
-      processClass()
+      classesCache.set(classes, true)
     }
-    classesCache.set(classes, true)
   }
 }
 export default processClasses
