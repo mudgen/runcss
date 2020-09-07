@@ -522,7 +522,7 @@ let cls2process = newObject({
   },
   opacity: () => {
     if (isNum(secondPart)) {
-      rule = 'opacity:' + 100 / secondPart
+      rule = 'opacity:' + secondPart / 100.0
     }
   },
   transition: () => {
@@ -624,7 +624,7 @@ let cls2process = newObject({
     let v = shadows[secondPart]
     if (v) {
       v = v.replace(/R/g, ' rgba(0, 0, 0, 0')
-      console.log(v)
+      // console.log(v)
       rule = `-webkit-box-shadow:${v};box-shadow:` + v
     }
   },
