@@ -62,7 +62,9 @@ export let configure = (conf = newObject()) => {
     for (let [key1, value1] of Object.entries(conf.colors)) {
       if (isObject(value1)) {
         for (let [key2, value2] of Object.entries(value1)) {
-          customColors.set(key1 + '-' + key2, hex6(value2))
+          if (key2 === 'default') {
+            customColors.set(key1, hex6(value2));
+          } else customColors.set(key1 + '-' + key2, hex6(value2));
         }
       } else {
         customColors.set(key1, hex6(value1))
@@ -170,7 +172,7 @@ let setColor = (type) => {
   if (secondPart === 'opacity' && isNum(thirdPart)) {
     rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
   } else {
-    let color = customColors.get(rest)
+    let color = customColors.get(rest.replace(/\s/g, '-')))
     if (color) {
       if (thirdPart && isObject(color)) {
         color = color[thirdPart]
@@ -287,7 +289,7 @@ let cls2process = newObject({
     if (includes('row!row-reverse!col!col-reverse', rest)) {
       rest = rest.replace('col', 'column')
       rule = `-webkit-box-orient:${secondPart === 'row' ? 'horizontal' : 'vertical'};-webkit-box-direction:${thirdPart === 'reverse' ? thirdPart : 'normal'};-ms-flex-direction:${rest};flex-direction:${rest}`
-    } else if (includes('no-wrap!flex-wrap!wrap-reverse', rest)) {
+    } else if (includes('no-wrap!wrap!wrap-reverse', rest)) {
       if (rest === 'no-wrap') {
         rest = 'nowrap'
       }
