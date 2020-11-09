@@ -62,7 +62,9 @@ export let configure = (conf = newObject()) => {
     for (let [key1, value1] of Object.entries(conf.colors)) {
       if (isObject(value1)) {
         for (let [key2, value2] of Object.entries(value1)) {
-          customColors.set(key1 + '-' + key2, hex6(value2))
+          if (key2 === 'default') {
+            customColors.set(key1, hex6(value2));
+          } else customColors.set(key1 + '-' + key2, hex6(value2));
         }
       } else {
         customColors.set(key1, hex6(value1))
@@ -170,7 +172,7 @@ let setColor = (type) => {
   if (secondPart === 'opacity' && isNum(thirdPart)) {
     rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
   } else {
-    let color = customColors.get(rest)
+    let color = customColors.get(rest.replace(/\s/g, '-'))
     if (color) {
       if (thirdPart && isObject(color)) {
         color = color[thirdPart]
@@ -287,7 +289,7 @@ let cls2process = newObject({
     if (includes('row!row-reverse!col!col-reverse', rest)) {
       rest = rest.replace('col', 'column')
       rule = `-webkit-box-orient:${secondPart === 'row' ? 'horizontal' : 'vertical'};-webkit-box-direction:${thirdPart === 'reverse' ? thirdPart : 'normal'};-ms-flex-direction:${rest};flex-direction:${rest}`
-    } else if (includes('no-wrap!flex-wrap!wrap-reverse', rest)) {
+    } else if (includes('no-wrap!wrap!wrap-reverse', rest)) {
       if (rest === 'no-wrap') {
         rest = 'nowrap'
       }
@@ -635,7 +637,7 @@ let cls2process = newObject({
   },
   pointer: () => {
     if (secondPart) {
-      rule = 'pointer-events:' + secondPart
+      rule = 'pointer-events:' + thirdPart
     }
   },
   select: () => {
@@ -792,27 +794,31 @@ function processClass () {
 
 function formatClass () {
   let v
-  if (secondPart === 'px') {
-    v = `${negative}1px`
-  } else if (secondPart === 'full') {
-    v = '100%'
-  } else if (secondPart === 'screen') {
-    if (firstPart === 'w') {
-      v = '100vw'
-    } else if (firstPart === 'h') {
-      v = '100vh'
+  if (firstPart === 'z') {
+    v = negative + secondPart;
+  } else {
+    if (secondPart === 'px') {
+      v = `${negative}1px`
+    } else if (secondPart === 'full') {
+      v = '100%'
+    } else if (secondPart === 'screen') {
+      if (firstPart === 'w') {
+        v = '100vw'
+      } else if (firstPart === 'h') {
+        v = '100vh'
+      }
+    } else if (secondPart === 'auto') {
+      v = 'auto'
+    } else if (isNum(secondPart)) {
+      v = negative + Number(secondPart) * 0.25 + 'rem'
+    } else if (secondPart.indexOf('/') > -1) {
+      let [top, bottom] = secondPart.split('/')
+      if (isNum(top) && isNum(bottom)) {
+        v = negative + (Number(top) / Number(bottom)).toFixed(6) + '%'
+      }
+    } else if (isStartNum(secondPart)) {
+      v = negative + secondPart
     }
-  } else if (secondPart === 'auto') {
-    v = 'auto'
-  } else if (isNum(secondPart)) {
-    v = negative + Number(secondPart) * 0.25 + 'rem'
-  } else if (secondPart.indexOf('/') > -1) {
-    let [top, bottom] = secondPart.split('/')
-    if (isNum(top) && isNum(bottom)) {
-      v = negative + (Number(top) / Number(bottom)).toFixed(6) + '%'
-    }
-  } else if (isStartNum(secondPart)) {
-    v = negative + secondPart
   }
 
   let basicPart = formatters[firstPart[0]]
