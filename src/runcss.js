@@ -172,7 +172,7 @@ let setColor = (type) => {
   if (secondPart === 'opacity' && isNum(thirdPart)) {
     rule = `--${type}-opacity:` + (thirdPart === '100' ? '1' : thirdPart / 100)
   } else {
-    let color = customColors.get(rest.replace(/\s/g, '-')))
+    let color = customColors.get(rest.replace(/\s/g, '-'))
     if (color) {
       if (thirdPart && isObject(color)) {
         color = color[thirdPart]
@@ -637,7 +637,7 @@ let cls2process = newObject({
   },
   pointer: () => {
     if (secondPart) {
-      rule = 'pointer-events:' + secondPart
+      rule = 'pointer-events:' + thirdPart
     }
   },
   select: () => {
