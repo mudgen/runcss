@@ -794,27 +794,31 @@ function processClass () {
 
 function formatClass () {
   let v
-  if (secondPart === 'px') {
-    v = `${negative}1px`
-  } else if (secondPart === 'full') {
-    v = '100%'
-  } else if (secondPart === 'screen') {
-    if (firstPart === 'w') {
-      v = '100vw'
-    } else if (firstPart === 'h') {
-      v = '100vh'
+  if (firstPart === 'z') {
+    v = negative + secondPart;
+  } else {
+    if (secondPart === 'px') {
+      v = `${negative}1px`
+    } else if (secondPart === 'full') {
+      v = '100%'
+    } else if (secondPart === 'screen') {
+      if (firstPart === 'w') {
+        v = '100vw'
+      } else if (firstPart === 'h') {
+        v = '100vh'
+      }
+    } else if (secondPart === 'auto') {
+      v = 'auto'
+    } else if (isNum(secondPart)) {
+      v = negative + Number(secondPart) * 0.25 + 'rem'
+    } else if (secondPart.indexOf('/') > -1) {
+      let [top, bottom] = secondPart.split('/')
+      if (isNum(top) && isNum(bottom)) {
+        v = negative + (Number(top) / Number(bottom)).toFixed(6) + '%'
+      }
+    } else if (isStartNum(secondPart)) {
+      v = negative + secondPart
     }
-  } else if (secondPart === 'auto') {
-    v = 'auto'
-  } else if (isNum(secondPart)) {
-    v = negative + Number(secondPart) * 0.25 + 'rem'
-  } else if (secondPart.indexOf('/') > -1) {
-    let [top, bottom] = secondPart.split('/')
-    if (isNum(top) && isNum(bottom)) {
-      v = negative + (Number(top) / Number(bottom)).toFixed(6) + '%'
-    }
-  } else if (isStartNum(secondPart)) {
-    v = negative + secondPart
   }
 
   let basicPart = formatters[firstPart[0]]
