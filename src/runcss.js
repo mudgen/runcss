@@ -16,7 +16,9 @@ let addedScreens
 const parentSheet = document.head.appendChild(document.createElement('style')).sheet
 export const exportCSS = () => {
   if (!parentSheet) return ''
-  return [...parentSheet.cssRules].map((rule) => rule.cssText).filter(rule => !/{\s+}$/g.test(rule))
+  return [...parentSheet.cssRules]
+    .filter((rule) => !rule.cssRules || rule.cssRules.length)
+    .map((rule) => rule.cssText.replace(/^@media\s*{([\s\S]*)}$/, '$1'))
     .join('').replace(/[\s\n]+/g, ' ')
 }
 
