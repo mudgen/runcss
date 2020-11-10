@@ -23,7 +23,7 @@ rel="stylesheet">
 ```
 __Step 2.__ Import the RunCSS Javascript file into your application:
 ```javascript
-import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+import processClasses from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
 ```
 __Step 3.__ Call the `processClasses` function on CSS class names. It is possible to integrate RunCSS into existing Javascript libraries so that `processClass` is called automatically when CSS class names are used. RunCSS ignores class names it has already generated CSS for so `processClasses` can be called repeatedly on the same class names.
 ### Example
@@ -34,7 +34,7 @@ Here is an example that integrates RunCSS with [Webscript](https://mudgen.github
 import builders from 'https://unpkg.com/webscript@^0/dist/webscript.modern.js'
 import createDOMElement from 'https://unpkg.com/webscript@^0/dist/createDOMElement.modern.js'
 // Importing RunCSS
-import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+import processClasses from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
 
 // Integrating RunCSS with Webscript
 function createElement (type, props, ...children) {
@@ -80,7 +80,7 @@ Here is a simple example of how to use RunCSS without integration with an existi
   </div>    
   <!-- This code generates all the CSS needed for the webpage. -->
   <script type="module">
-    import processClasses from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+    import processClasses from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
     // Get all elements that have a class attribute.
     for(const element of document.querySelectorAll('*[class]')) {    
       processClasses(element.className)
@@ -118,6 +118,27 @@ Many of the following sections show RunCSS's extended capabilities.
 ## Configuration
 RunCSS provides the `configure` function that can be used to configure parts of RunCSS. The following sections in this article that can use `configure` show how to use it.
 
+## Exporting
+If after using RunCSS to build a page you want to decrease scripts being run or provide support for non-JavaScript-enabled users, but you don't need the complexity of a full Tailwind setup, the CSS generated can be exported using the `exportCSS` function. This returns a minified string of all the class styles so-far processed.
+
+E.g.
+```javascript
+// import the exportCSS function
+import processClasses, { exportCSS } from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
+
+// process some classes
+processClasses('bg-gray-100 p-12 hover:text-red');
+
+// log the generated styles
+console.log(exportCSS());
+```
+
+This will give you: 
+```css
+@media { .bg-gray-100 { background-color: rgba(247,250,252,var(--background-color-opacity,1)); } .p-12 { padding: 3rem; } .hover\:text-red:hover { color: red; } }@media (min-width: 768px) { .md\:flex { display: flex; } }
+```
+
+
 ## Colors
 RunCSS provides the same [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette) as TailwindCSS.
 
@@ -147,7 +168,7 @@ It is possible to make your own color palette by configuring colors with the `co
 Here is an example that sets the 'blue' keyword to the color red and sets some banana colors:
 ```javascript
 // import the configure function
-import processClasses, { configure } from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+import processClasses, { configure } from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
 
 // create our own color palette
 configure({
@@ -253,7 +274,7 @@ CSS will be generated using the last two arguments.
 
 ### Component Example
 ```javascript
-import processClasses, { component } from 'https://unpkg.com/runcss@^0/dist/runcss.modern.js'
+import processClasses, { component } from 'https://cdn.statically.io/gh/mudgen/runcss/master/src/runcss.min.js'
 
 component(
   'btn', // new class name

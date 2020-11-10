@@ -9,10 +9,16 @@ let ifRemTo = (v) => isNum(v) ? negative + Number(v) * 0.25 + 'rem' : negative +
 let newObject = (o = {}) => Object.assign(Object.create(null), o)
 let classesCache = new Map()
 let customCache = new Map()
-let parentSheet
 let config = newObject({ separator: ':', screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px' } })
 let componentName
 let addedScreens
+
+const parentSheet = document.head.appendChild(document.createElement('style')).sheet
+export const exportCSS = () => {
+  if (!parentSheet) return ''
+  return [...parentSheet.cssRules].map((rule) => rule.cssText).filter(rule => !/{\s+}$/g.test(rule))
+    .join('').replace(/[\s\n]+/g, ' ')
+}
 
 export let component = (name, classes, props) => {
   if (typeof name !== 'string') {
@@ -63,8 +69,8 @@ export let configure = (conf = newObject()) => {
       if (isObject(value1)) {
         for (let [key2, value2] of Object.entries(value1)) {
           if (key2 === 'default') {
-            customColors.set(key1, hex6(value2));
-          } else customColors.set(key1 + '-' + key2, hex6(value2));
+            customColors.set(key1, hex6(value2))
+          } else customColors.set(key1 + '-' + key2, hex6(value2))
         }
       } else {
         customColors.set(key1, hex6(value1))
@@ -73,12 +79,6 @@ export let configure = (conf = newObject()) => {
   } else {
     Object.assign(config, conf)
   }
-}
-
-if (document.styleSheets.length === 0) {
-  parentSheet = document.head.appendChild(document.createElement('style')).sheet
-} else {
-  parentSheet = document.styleSheets[0]
 }
 
 let media = new Map()
@@ -795,7 +795,7 @@ function processClass () {
 function formatClass () {
   let v
   if (firstPart === 'z') {
-    v = negative + secondPart;
+    v = negative + secondPart
   } else {
     if (secondPart === 'px') {
       v = `${negative}1px`
@@ -840,6 +840,7 @@ function formatClass () {
 }
 
 let findInSheet = (sheet) => {
+  if (sheet.href && new URL(sheet.href).origin !== window.location.origin) return []
   let rules = []
   for (let rule of [...sheet.cssRules]) {
     // eslint-disable-next-line no-undef
@@ -880,7 +881,10 @@ let notFound = () => {
       }
     } else {
       for (let [rule, sheet] of rules) {
-        setRule(rule, sheet)
+        // keeps all rules inserted into the same sheet:
+        // rules can be set to media queries but should not be added to
+        // any sheets other than parentSheet
+        setRule(rule, sheet.parentStyleSheet ? sheet : null)
       }
     }
   }
