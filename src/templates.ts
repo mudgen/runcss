@@ -1,27 +1,11 @@
-(() => {
-  // src/utils.ts
-  var splitOnFirst = (char, string) => {
-    const index = string.indexOf(char);
-    if (index === -1)
-      return [string, ""];
-    return [string.substring(0, index), string.substring(index + char.length)];
-  };
-  var dictionarify = (template) => {
-    const dictionary = {};
-    const lines = template.split("\n");
-    for (let line of lines) {
-      line = line.trim();
-      if (line.length === 0)
-        continue;
-      const values = line.split("!");
-      dictionary[values[0]] = values[1] || values[0];
-    }
-    return dictionary;
-  };
+import { dictionarify } from "./utils.js"
 
-  // src/templates.ts
-  var transform = `transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))`;
-  var allSides = (prefix, resolver, rule) => `
+
+
+const transform = `transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))`
+
+// calculate top, bottom, left and right variant
+const allSides = (prefix : string, resolver : string, rule :string) => `
 ${prefix}x!${resolver}!${rule}-left:$;${rule}-right:$
 ${prefix}y!${resolver}!${rule}-top:$;${rule}-bottom:$
 ${prefix}s!${resolver}!${rule}-inline-start
@@ -29,32 +13,36 @@ ${prefix}e!${resolver}!${rule}-inline-end
 ${prefix}t!${resolver}!${rule}-top
 ${prefix}r!${resolver}!${rule}-right
 ${prefix}b!${resolver}!${rule}-bottom
-${prefix}l!${resolver}!${rule}-left`;
-  var borderDefaults = "";
-  var borderClasses = "";
-  var addBorder = (prefix, value) => {
-    if (prefix !== "")
-      prefix = "-" + prefix;
-    if (!value.includes("$"))
-      value += ":$";
-    borderDefaults += `rounded${prefix}!${value.replaceAll("$", "0.25rem")}
-`;
-    borderClasses += `rounded${prefix}!b!${value}
-`;
-  };
-  `!border-radius: $;
+${prefix}l!${resolver}!${rule}-left`
+
+
+// calculate all the possible border radius rules
+// those are a lot, and very convoluted
+let borderDefaults = ''
+let borderClasses = ''
+
+const addBorder = (prefix: string, value: string) => {
+  if(prefix !== '') prefix = '-' + prefix
+  if(!value.includes('$')) value +=':$'
+  // @ts-ignore
+  borderDefaults += `rounded${prefix}!${value.replaceAll('$', '0.25rem')}\n`
+  borderClasses +=`rounded${prefix}!b!${value}\n`
+}
+
+;`!border-radius: $;
 s!border-start-start-radius: $; border-end-start-radius: $;
 e!border-start-end-radius: $; border-end-end-radius: $;
 t!border-top-left-radius: $;border-top-right-radius: $;
 r!border-top-right-radius: $; border-bottom-right-radius: $;
 b!border-bottom-right-radius: $; border-bottom-left-radius: $;
 l!border-top-left-radius: $; border-bottom-left-radius: $;
-`.split("\n").forEach((line) => {
-    if (!line.includes("!"))
-      return;
-    addBorder(...line.split("!"));
-  });
-  `ss!start-start
+`.split('\n').forEach(line => {
+  if(!line.includes('!')) return
+  //@ts-ignore
+  addBorder(...line.split('!'))
+})
+
+;`ss!start-start
 se!start-end
 ee!end-end
 es!end-start
@@ -62,13 +50,19 @@ tr!top-right
 tl!top-left
 br!bottom-right
 bl!bottom-left
-`.split("\n").forEach((line) => {
-    if (!line.includes("!"))
-      return;
-    const values = line.split("!");
-    addBorder(values[0], `border-${values[1]}-radius`);
-  });
-  var defaults = dictionarify(`
+`.split('\n').forEach(line => {
+  if(!line.includes('!')) return
+  const values = line.split('!')
+  //@ts-ignore
+  addBorder(values[0], `border-${values[1]}-radius`)
+})
+
+
+
+
+
+
+export const defaults = dictionarify(`
 ${borderDefaults}
 container!width: 100%
 box-border!box-sizing: border-box
@@ -303,32 +297,34 @@ snap-proximity!--tw-scroll-snap-strictness: proximity;
 
 sr-only!position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip: rect(0, 0, 0, 0);white-space: nowrap;border-width: 0;
 not-sr-only!position: static;width: auto;height: auto;padding: 0;margin: 0;overflow: visible;clip: auto;white-space: normal;
-`);
-  var classesDictionarify = (template) => {
-    const results = {};
-    for (let line of template.split("\n")) {
-      line = line.trim();
-      if (line === "")
-        continue;
-      let [rule, ...values] = line.split("!").map((el) => el.trim());
-      if (values.length == 0)
-        values.push("");
-      if (values.length == 1)
-        values.push(rule);
-      for (let i = 1; i < values.length; i++) {
-        if (!values[i].includes("$"))
-          values[i] += ":$";
-      }
-      let atTop = false;
-      if (rule.startsWith("+")) {
-        rule = rule.substring(1);
-        atTop = true;
-      }
-      results[rule] = [atTop, ...values];
+`)
+
+
+const classesDictionarify = (template: string) => {
+  const results = {}
+  for(let line of template.split('\n')) {
+    line = line.trim()
+    if(line === '') continue
+    //console.log(line)
+    let [rule, ...values] = line.split('!').map(el => el.trim())
+
+    if(values.length == 0) values.push('');
+    if(values.length == 1) values.push(rule);
+    for(let i = 1; i < values.length; i++){
+      if(!values[i].includes('$')) values[i] +=':$'
     }
-    return results;
-  };
-  var classes = classesDictionarify(`
+    let atTop = false
+    if(rule.startsWith('+')){
+      rule = rule.substring(1)
+      atTop = true
+    }
+    //console.log(rule, values)
+    results[rule] = [atTop, ...values]
+  }
+  return results
+}
+
+export const classes = classesDictionarify(`
 ${borderClasses}
 aspect!r!aspect-ratio
 container!l!max-width
@@ -380,9 +376,9 @@ place-content!s!
 place-items!!
 place-self!!
 p!4!padding
-${allSides("p", "4", "padding")}
+${allSides('p', '4', 'padding')}
 m!4!margin
-${allSides("m", "4", "margin")}
+${allSides('m', '4', 'margin')}
 w!4d!width
 min-w!l!min-width
 max-w!!
@@ -464,8 +460,33 @@ select!!user-select
 will-change
 fill!C
 stroke!!stroke-width
-`);
-  var colorsTemplate = `Slate
+`)
+
+
+// TODO: SOLVE THESE
+
+// https://tailwindcss.com/docs/object-position
+// https://tailwindcss.com/docs/grid-template-columns
+// https://tailwindcss.com/docs/grid-column
+// https://tailwindcss.com/docs/space
+// https://tailwindcss.com/docs/max-width
+// https://tailwindcss.com/docs/animation
+// https://tailwindcss.com/docs/transition-property
+// https://tailwindcss.com/docs/border-spacing
+
+
+// NEGATIVE VALUES THAT START WITH MINUS -
+
+// SOLVE CONFLICT WITH DECORATION AND BG
+//https://tailwindcss.com/docs/text-decoration-thickness
+// https://tailwindcss.com/docs/background-position
+// https://tailwindcss.com/docs/gradient-color-stops
+// stroke
+
+
+/** List of colors and their variants, taken from:
+ *  https://tailwindcss.com/docs/customizing-colors#using-the-default-colors */
+export const colorsTemplate = `Slate
 #f8fafc
 #f1f5f9
 #e2e8f0
@@ -728,368 +749,4 @@ Rose
 #be123c
 #9f1239
 #881337
-#4c0519`;
-
-  // src/resolvers.ts
-  var resolvers = {};
-  var registerCustomValues = (resolver, template) => {
-    const values = {};
-    for (let line of template.trim().split("\n")) {
-      if (!line.includes("!"))
-        continue;
-      const [key, value] = splitOnFirst("!", line);
-      values[key.trim()] = value.trim();
-    }
-    resolvers[resolver] = (value) => {
-      if (value in values) {
-        return values[value];
-      }
-      return null;
-    };
-  };
-  var numResolverFactory = (scale) => (value) => {
-    if (value === "full")
-      return "100%";
-    if (value === "px")
-      return "1px";
-    if (value.includes("/")) {
-      try {
-        const split = value.split("/");
-        const result = parseInt(split[0], 10) / parseInt(split[1], 10);
-        return `${result * 100}%`;
-      } catch (e) {
-      }
-    }
-    if (!isNaN(value))
-      return `${Number(value) * scale}px`;
-    return null;
-  };
-  resolvers["1"] = numResolverFactory(1);
-  resolvers["4"] = numResolverFactory(4);
-  resolvers["P"] = (value) => {
-    if (!isNaN(value))
-      return `${Number(value) / 100}`;
-    return null;
-  };
-  resolvers["_"] = (value) => {
-    return value.replaceAll("_", " ");
-  };
-  var colorVariants = `50!100!200!300!400!500!600!700!800!900!950`.split("!");
-  var colors = {};
-  var colorsLines = colorsTemplate.split("\n");
-  for (let i = 0; i < colorsLines.length; i++) {
-    const colorName = colorsLines[i].trim().toLowerCase();
-    for (let variant of colorVariants) {
-      i += 1;
-      colors[colorName + "-" + variant] = colorsLines[i].trim();
-    }
-  }
-  colors["transparent"] = "transparent";
-  resolvers["C"] = (value) => {
-    if (value in colors) {
-      return colors[value];
-    }
-    return null;
-  };
-  registerCustomValues("r", `
-auto!auto
-square!1/1
-video!16/9
-`);
-  registerCustomValues("l", `
-sm!640px
-md!768px
-lg!1024px
-xl!1280px
-2xl!1536px
-`);
-  registerCustomValues("c", `
-3xs !16rem
-2xs !18rem
-xs  !20rem
-sm  !24rem
-md  !28rem
-lg  !32rem
-xl  !36rem
-2xl !42rem
-3xl !48rem
-4xl !56rem
-5xl !64rem
-6xl !72rem
-7xl !80rem
-`);
-  registerCustomValues("b", `
-none!0px
-sm!0.125rem
-md!0.375rem
-lg!0.5rem
-xl!0.75rem
-2xl!1rem
-3xl!1.5rem
-full!9999px
-`);
-  registerCustomValues("o", `
-first!-9999
-last!9999
-none!0
-`);
-  registerCustomValues("s", `
-start!flex-start
-end!flex-end
-between!space-between
-around!space-around
-evenly!space-evenly
-`);
-  registerCustomValues("d", `
-min!min-content
-max!max-content
-fit!fit-content
-`);
-  registerCustomValues("w", `
-thin!100;
-extralight!200;
-light!300;
-normal!400;
-medium!500;
-semibold!600;
-bold!700;
-extrabold!800;
-black!900;
-`);
-  registerCustomValues("t", `
-tighter!-0.05em;
-tight!-0.025em;
-normal!0em;
-wide!0.025em;
-wider!0.05em;
-widest!0.1em;
-`);
-
-  // src/states.ts
-  var pseudoClasses = dictionarify(`
-hover
-focus
-focus-within
-focus-visible
-active
-visited
-target
-first!first-child
-last!last-child
-only!only-child
-odd!nth-child(odd)
-even!:nth-child(even)
-first-of-type
-last-of-type
-only-of-type
-empty
-disabled
-enabled
-checked
-indeterminate
-default
-required
-valid
-invalid
-in-range
-out-of-range
-placeholder-shown
-autofill
-read-only
-`);
-  var pseudoElements = dictionarify(`
-before
-after
-placeholder
-file!file-selector-button
-marker
-selection
-first-line
-first-letter
-backdrop
-`);
-  var mediaQueries = dictionarify(`
-sm!(min-width: 640px)
-md!(min-width: 768px)
-lg!(min-width: 1024px)
-xl!(min-width: 1280px)
-2xl!(min-width: 1536px)
-max-sm!not all and (min-width: 640px)
-max-md!not all and (min-width: 768px)
-max-lg!not all and (min-width: 1024px)
-max-xl!not all and (min-width: 1280px)
-max-2xl!not all and (min-width: 1536px)
-dark!(prefers-color-scheme: dark)
-portrait!(orientation: portrait)
-landscape!(orientation: landscape)
-motion-safe!(prefers-reduced-motion: no-preference)
-motion-reduce!(prefers-reduced-motion: reduce)
-contrast-more!(prefers-contrast: more)
-contrast-less!(prefers-contrast: less)
-print!print
-`);
-  var modifiers = dictionarify(`
-aria-checked![aria-checked="true"]
-aria-disabled![aria-disabled="true"]
-aria-expanded![aria-expanded="true"]
-aria-hidden![aria-hidden="true"]
-aria-pressed![aria-pressed="true"]
-aria-readonly![aria-readonly="true"]
-aria-required![aria-required="true"]
-aria-selected![aria-selected="true"]
-open![open]
-`);
-  var parentModifiers = dictionarify(`
-rtl![dir="rtl"]
-ltr![dir="ltr"]
-`);
-  var stateDictionaries = {
-    pseudoClasses,
-    pseudoElements,
-    mediaQueries,
-    modifiers,
-    parentModifiers
-  };
-
-  // src/index.ts
-  var { sheet } = document.head.appendChild(document.createElement("style"));
-  var inserted = /* @__PURE__ */ new Set();
-  var insert = (clazz, resolvedDeclaration, atTop) => {
-    if (!resolvedDeclaration)
-      return;
-    inserted.add(clazz);
-    const categorizedStates = {};
-    for (const state of Object.keys(stateDictionaries))
-      categorizedStates[state] = [];
-    let peers = "", groups = "";
-    const states = clazz.split(":");
-    for (let i = 0; i < states.length - 1; i++) {
-      if (states[i].startsWith("peer-")) {
-        let peerName = "peer";
-        let peerModifier = states[i].substring("peer-".length);
-        const slash = peerModifier.indexOf("/");
-        if (slash !== -1) {
-          peerName = peerModifier.substring(0, slash);
-          peerModifier = peerModifier.substring(slash + 1);
-        }
-        peers += `.${peerName}:${peerModifier}~`;
-      }
-      if (states[i].startsWith("group-")) {
-        let peerName = "group";
-        let peerModifier = states[i].substring("group-".length);
-        const slash = peerModifier.indexOf("/");
-        if (slash !== -1) {
-          peerName = peerModifier.substring(0, slash);
-          peerModifier = peerModifier.substring(slash + 1);
-        }
-        groups += `.${peerName}:${peerModifier} `;
-      }
-      for (let [key, dictionary] of Object.entries(stateDictionaries)) {
-        if (states[i] in dictionary) {
-          categorizedStates[key].push(dictionary[states[i]]);
-        }
-      }
-    }
-    let rule = `${groups}${peers}.${clazz.replace(/[\[\].:()&@~*^$%,#\/]/g, "\\$&") + categorizedStates.pseudoClasses.map((el) => ":" + el).join("") + categorizedStates.pseudoElements.map((el) => "::" + el).join("") + categorizedStates.modifiers.join("")} {${resolvedDeclaration}}`;
-    if (categorizedStates.mediaQueries.length > 0) {
-      rule = `@media ${categorizedStates.mediaQueries.join(" and ")}{${rule}}`;
-    }
-    sheet.insertRule(rule, atTop ? 0 : sheet.cssRules.length);
-  };
-  var resolveValue = (resolversList, value) => {
-    if (value.startsWith("[")) {
-      return [value.substring(1, value.lastIndexOf("]")), 9999];
-    }
-    let i = 0;
-    for (let resolver of resolversList.split("")) {
-      if (resolver in resolvers) {
-        const result = resolvers[resolver](value);
-        if (result !== null)
-          return [result, i];
-        i += 1;
-      }
-    }
-    return [value, 9999];
-  };
-  var applyImportantModifier = (important, resolvedDeclaration) => important ? resolvedDeclaration.replaceAll(";", "!important;") : resolvedDeclaration;
-  var resolveDeclaration = (clazz) => {
-    if (clazz.length === 0)
-      return [];
-    let important = false;
-    let minus = false;
-    if (clazz.startsWith("!")) {
-      clazz = clazz.substring(1);
-      important = true;
-    }
-    if (clazz.startsWith("-")) {
-      clazz = clazz.substring(1);
-      minus = true;
-    }
-    const stateIndex = clazz.lastIndexOf(":");
-    const declaration = stateIndex === -1 ? clazz : clazz.substring(clazz.lastIndexOf(":") + 1);
-    let lastIndex = declaration.length;
-    if (declaration in defaults)
-      return [applyImportantModifier(important, defaults[declaration]), false];
-    while (true) {
-      const index = declaration.lastIndexOf("-", lastIndex - 1);
-      if (index === -1 || index === 0)
-        return [];
-      lastIndex = index;
-      const property = declaration.substring(0, index).trim();
-      const value = declaration.substring(index + 1).trim();
-      if (property in classes) {
-        const [atTop, resolversList, ...cssClasses] = classes[property];
-        const [resolved, resolvedIndex] = resolveValue(resolversList, value);
-        const classIndex = Math.min(cssClasses.length - 1, resolvedIndex);
-        return [applyImportantModifier(important, `${cssClasses[classIndex].replaceAll("$", (minus ? "-" : "") + resolved)};`), atTop];
-      }
-    }
-  };
-  var processClasses = (classes2) => {
-    classes2.split(" ").forEach((clazz) => {
-      clazz = clazz.trim();
-      if (!clazz || inserted.has(clazz))
-        return;
-      const [resolvedDeclaration, atTop] = resolveDeclaration(clazz);
-      insert(clazz, resolvedDeclaration, atTop);
-    });
-  };
-  var observers = [];
-  var startWatching = (targetNode) => {
-    const config = {
-      attributes: true,
-      attributeFilter: ["class"],
-      childList: true,
-      subtree: true
-    };
-    const callback = (mutationList) => {
-      for (const mutation of mutationList) {
-        if (mutation.addedNodes) {
-          for (let node of mutation.addedNodes) {
-            if (node.hasAttribute("class")) {
-              processClasses(node.getAttribute("class"));
-            }
-          }
-        }
-        if (mutation.type === "attributes" && mutation.target.hasAttribute("class")) {
-          processClasses(mutation.target.getAttribute("class"));
-        }
-      }
-    };
-    const observer = new MutationObserver(callback);
-    observer.observe(targetNode ?? document.body, config);
-    observers.push(observer);
-  };
-
-  // src/iife.ts
-  for (const element of document.querySelectorAll("*[class]")) {
-    processClasses(element.getAttribute("class"));
-  }
-  if (document.currentScript.hasAttribute("watch")) {
-    startWatching();
-  }
-  var hiddenNodes = document.querySelectorAll("*[runcss-cloak]");
-  for (let node of hiddenNodes) {
-    node.removeAttribute("runcss-cloak");
-  }
-})();
+#4c0519`
