@@ -4,7 +4,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A utility-first CSS runtime for rapid UI development.",
   "main": "dist/runcss.min.mjs",
   "module": "dist/runcss.min.mjs",
@@ -14,7 +14,9 @@
 
     "dev:css": "esbuild ./src/index.css --bundle --outfile=dist/runcss.css --watch",
     "dev:js": "esbuild ./src/iife.js --bundle --outfile=dist/runcss.js --watch",
-    "dev:module": "esbuild ./src/index.js --format=esm --bundle --outfile=dist/runcss.mjs --watch"
+    "dev:module": "esbuild ./src/index.js --format=esm --bundle --outfile=dist/runcss.mjs --watch",
+
+    "prepublishOnly": "bun build.js"
   },
   "repository": {
     "type": "git",
