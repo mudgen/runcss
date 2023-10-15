@@ -1,11 +1,20 @@
 {
   "name": "runcss",
-  "version": "0.0.13",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "version": "0.1.0",
   "description": "A utility-first CSS runtime for rapid UI development.",
-  "main": "dist/runcss.js",
+  "main": "dist/runcss.min.mjs",
+  "module": "dist/runcss.min.mjs",
   "scripts": {
-    "format": "standard src/*.js --fix",
-    "build": "microbundle src/*.js"
+    "build": "bun build.js",
+    "dev": "concurrently 'five-server --open=examples' 'npm run dev:css' 'npm run dev:js' 'npm run dev:module'",
+
+    "dev:css": "esbuild ./src/index.css --bundle --outfile=dist/runcss.css --watch",
+    "dev:js": "esbuild ./src/iife.js --bundle --outfile=dist/runcss.js --watch",
+    "dev:module": "esbuild ./src/index.js --format=esm --bundle --outfile=dist/runcss.mjs --watch"
   },
   "repository": {
     "type": "git",
@@ -16,17 +25,15 @@
     "javascript",
     "ui"
   ],
-  "author": "Nick Mudge",
+  "author": "Luca Fabbian, Nick Mudge",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mudgen/runcss/issues"
+    "url": "https://github.com/lucafabbian/runcss/issues"
   },
-  "homepage": "https://github.com/mudgen/runcss#readme",
+  "homepage": "https://github.com/lucafabbian/runcss#readme",
   "devDependencies": {
-    "microbundle": "^0.12.0",
-    "standard": "^14.3.4"
-  },
-  "dependencies": {
-    "webscript": "^0.2.0"
+    "concurrently": "^8.2.1",
+    "esbuild": "^0.19.4",
+    "five-server": "^0.3.1"
   }
 }

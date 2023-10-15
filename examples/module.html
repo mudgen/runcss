@@ -1,0 +1,25 @@
+<head>
+  <link rel="stylesheet" href="../dist/runcss.css">
+</head>
+<body>
+
+
+  <p class="sm:text-green-500 text-red-500">hello world!</p>
+
+
+  <script type="module">
+    import RunCSS from '../dist/runcss.mjs'
+
+    const {processClasses, exportCSS } = RunCSS()
+
+    for(const element of document.querySelectorAll('*[class]')) {
+      processClasses(element.getAttribute("class"))
+    }
+
+    console.log(exportCSS())
+    
+  </script>
+</body>
+
+
+
