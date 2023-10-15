@@ -4,21 +4,13 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A utility-first CSS runtime for rapid UI development.",
   "main": "dist/runcss.min.mjs",
   "module": "dist/runcss.min.mjs",
   "scripts": {
+    "build": "bun build.js",
     "dev": "concurrently 'five-server --open=examples' 'npm run dev:css' 'npm run dev:js' 'npm run dev:module'",
-    "build": "npm run build:css && npm run build:js && npm run build:module",
-
-    "build:css": "esbuild ./src/index.css --bundle --outfile=dist/runcss.css",
-    "build:js": "esbuild ./src/iife.js --bundle --outfile=dist/runcss.js",
-    "build:module": "esbuild ./src/index.js --format=esm --bundle --outfile=dist/runcss.mjs",
-
-    "minify:css": "esbuild ./src/index.css --bundle --outfile=dist/runcss.min.css --minify",
-    "minify:js": "esbuild ./src/iife.js --bundle --outfile=dist/runcss.min.js --minify",
-    "minify:module": "esbuild ./src/index.js --format=esm --bundle --outfile=dist/runcss.min.mjs --minify",
 
     "dev:css": "esbuild ./src/index.css --bundle --outfile=dist/runcss.css --watch",
     "dev:js": "esbuild ./src/iife.js --bundle --outfile=dist/runcss.js --watch",

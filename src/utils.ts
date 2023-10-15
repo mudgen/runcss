@@ -16,3 +16,9 @@ export const dictionarify = (template: string) => {
   }
   return dictionary
 }
+
+export const purgedLines = (template: string) => 
+  template.trim().split('\n').map(l => l.trim()).filter( l => l !== '')
+
+export const clean = (template: string) => 
+  template.trim().split('\n').map(l => l.trim()).filter( l => l !== '').join('\n')

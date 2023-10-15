@@ -46,6 +46,15 @@
   --tw-backdrop-sepia: ;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 *[runcss-cloak]{
   visibility: hidden;

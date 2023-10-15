@@ -1,5 +1,6 @@
-import { processClasses, startWatching } from "./index.js"
+import RunCSS from "./index.js"
 
+const {processClasses, startWatching} = RunCSS()
 
 for(const element of document.querySelectorAll('*[class]')) {
   processClasses(element.getAttribute("class"))

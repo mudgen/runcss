@@ -5,18 +5,13 @@ RunCSS is the runtime equivalent of TailwindCSS, featuring the same CSS utility 
 
 RunCSS comes with batteries included. By default all [additional variants](https://tailwindcss.com/docs/configuring-variants) such as `hover`, `active`, `visited`, `group-hover`, `sm`, `lg` etc work with all class names. All packaged in a single 25kb (8kb after compression) JS file!
 
-### Why this fork?
-
-The original repository is no longer under active development. This fork aims to rewrite the package from scratch in order to improve it, solve some bugs and make it work with modern libraries.
-
-
 
 ## Usage
 
 Add to `<head>`:
 ```html
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@lucafabbian/runcss/dist/runcss.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@lucafabbian/runcss/dist/runcss.min.js" defer watch></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/runcss/dist/runcss.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/runcss/dist/runcss.min.js" defer watch></script>
 ```
 Done! RunCSS will parse the documents and generate the corresponding classes, with no further configuration required. RunCSS will also watch for new element insertions and parse them. Remove the `watch` attribute to disable this feature.
 
@@ -33,12 +28,12 @@ For example:
 </body>
 ```
 
-### Custom theme
+### Custom configuration
 **TODO - WORK IN PROGRESS**
 Before loading `runcss.js`, add the following script:
 ```html
 <script>
-window.runcssTheme = {
+window.runcssConfig = {
   colors: {
     'main': '#fff',
     'secondary': {
@@ -57,17 +52,18 @@ window.runcssTheme = {
   },
 }
 </script>
+<script></script>
 ```
 
-You may use it to either extend or override default values. Currently, we just supports `colors`, `screens` and `fontFamily`.
+You may use it to either extend or override default values. Currently, this is not yet implemented.  `colors`, `screens` and `fontFamily`.
 
 ## Advanced usage as module
 ```html
 <script type="module">
-  import { processClasses, startWatching, stopWatching, exportCSS, configureTheme } from "./index.js"
+  import RunCSS from "https://cdn.jsdelivr.net/npm/runcss/dist/runcss.min.mjs"
 
   // Setup theme
-  configureTheme({
+  const { processClasses, startWatching, stopWatching, exportCSS } = RunCSS({
     colors: {
       'main': '#fff',
     },
@@ -99,13 +95,20 @@ You may use it to either extend or override default values. Currently, we just s
 </script>
 ```
 
+## Caveats and differences with TailwindCSS 
+Currently, this project is still under development, but it aims to cover the totality of TailwindCSS classes.
+
+If you find something missing, feel free to open an issue.
+
+By design, this parser is way less strict than Tailwind's one. This allows smaller builds and faster load times, but also means that wrong values may be turned into CSS rules regardless. This is intentional, because the browser will discard those rules anyway.
+
 
 ## Build / contribute
-Clone this repository and use [bun](https://bun.sh/) or npm to install dependencies:
+Clone this repository and use [bun](https://bun.sh/) to install dependencies:
 ```bash
 git clone https://github.com/lucafabbian/runcss.git
 cd runcss
-bun i # or npm i
+bun i
 ```
 
 Then, you may use:
@@ -115,18 +118,11 @@ bun run dev      # Build, watch for changes + start server with live reload!
 ```
 
 
-## Caveats and differences with TailwindCSS 
-Currently, this project is still under development, but it aims to cover the totality of TailwindCSS classes.
-
-If you find something missing, feel free to open an issue.
-
-By design, this parser is way less strict than Tailwind's one. This allows smaller builds and faster load times, but also means that wrong values may be turned into CSS rules regardless. This is intentional, because the browser will discard those rules anyway.
-
 ## Authors and License
 
-Main author: Luca Fabbian <luca.fabbian.1999@gmail.com>
+Current author: Luca Fabbian <luca.fabbian.1999@gmail.com>
 
-Based on RunCSS of mudgen, [follow him on twitter.](https://twitter.com/mudgen)
+Based on RunCSS of mudgen, [follow him on twitter](https://twitter.com/mudgen).
 
 Distributed under MIT License.
 

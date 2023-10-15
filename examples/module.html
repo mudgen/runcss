@@ -4,11 +4,13 @@
 <body>
 
 
-  <p class="sm:text-red text-blue">hello world!</p>
+  <p class="sm:text-green-500 text-red-500">hello world!</p>
 
 
   <script type="module">
-    import {processClasses, exportCSS } from '../dist/runcss.mjs'
+    import RunCSS from '../dist/runcss.mjs'
+
+    const {processClasses, exportCSS } = RunCSS()
 
     for(const element of document.querySelectorAll('*[class]')) {
       processClasses(element.getAttribute("class"))
