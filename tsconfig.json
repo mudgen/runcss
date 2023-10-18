@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
+        "lib": ["es5", "es6", "es2021", "dom", "dom.iterable" ],
         "target": "es2021",
-        "module": "commonjs",
+        "module": "es2022",
     }, 
-    "include": ["src/**/*"]
+    "include": ["src/index.ts"]
 }
