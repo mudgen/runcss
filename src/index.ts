@@ -24,15 +24,42 @@ in the following example:
 - blue is the resolvedValue  
 
 */
-import { exact, arbitrary } from "./parser.js"
-import { stateDictionaries } from "./states.js"
+import { parseRuleTemplate, ruleTemplate, shortcuts } from "./parser.js"
+import { defaultsTemplate} from './templates.preprocess.js'
+import { states } from "./states.js"
 
 
 let initialized = false
+const plugins : Array<(arg0:any) => any> = []
+export const extendRunCSS = (plugin: (arg0: any) => any) => {
+  if(initialized) throw "Error: can't install RunCSS plugins after initialization"
 
-export default () => {
+  plugins.push(plugin)
+}
+
+export default (options: Record<string, any>) => {
   if(initialized) throw "Error: can't initialize RunCSS twice"
   initialized = true
+
+  // parse plugins and options
+  let parsedOptions = {
+    defaultsTemplate,
+    ruleTemplate,
+    shortcuts,
+    states,
+
+    ...options,
+  }
+
+  for(let plugin of plugins){
+    parsedOptions = {
+      ...parsedOptions,
+      ...plugin(parsedOptions),
+    }
+  }
+
+
+  const [exact, arbitrary] = parseRuleTemplate(parsedOptions.defaultsTemplate, parsedOptions.ruleTemplate, parsedOptions.shortcuts)
 
   /** Main stylesheets where we append parsed classes */
   const sheets = Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map( () => document.head.appendChild(document.createElement('style')).sheet)
@@ -58,7 +85,7 @@ export default () => {
 
     // divide states by categories (media queries, pseudo classes, ...)
     const categorizedStates : Record<string, Array<string>> = {}
-    for(const state of Object.keys(stateDictionaries)) categorizedStates[state] = []
+    for(const state of Object.keys(parsedOptions.states)) categorizedStates[state] = []
     let peers = '', groups = ''
 
     const states = clazz.split(':')
@@ -84,7 +111,7 @@ export default () => {
         groups+=`.${peerName}:${peerModifier} `
       }
 
-      for(let [key, dictionary] of Object.entries(stateDictionaries)){
+      for(let [key, dictionary] of Object.entries(parsedOptions.states)){
         if(states[i] in dictionary){
           categorizedStates[key].push(dictionary[states[i]]);
         }
@@ -242,4 +269,4 @@ export default () => {
 
 
 
-
+export {defaultsTemplate, ruleTemplate, shortcuts, states}

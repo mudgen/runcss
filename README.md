@@ -60,7 +60,13 @@ You may use it to either extend or override default values. Currently, this is n
 ## Advanced usage as module
 ```html
 <script type="module">
-  import RunCSS from "https://cdn.jsdelivr.net/npm/runcss/dist/runcss.min.mjs"
+  import RunCSS, {extendRunCSS} from "https://cdn.jsdelivr.net/npm/runcss/dist/runcss.min.mjs"
+
+  // Add things to the RunCSS templates
+  extendRunCSS( ({defaultsTemplate, ruleTemplate, shortcuts, states}) => {
+    states.modifiers['myclass'] = '.myclass'
+    return {defaultsTemplate, ruleTemplate, shortcuts, states}
+  })
 
   // Setup theme
   const { processClasses, startWatching, stopWatching, exportCSS } = RunCSS({

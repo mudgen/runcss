@@ -85,7 +85,7 @@ ltr![dir="ltr"]
 `)
 
 
-export const stateDictionaries = {
+export const states = {
   pseudoClasses,
   pseudoElements,
   mediaQueries,

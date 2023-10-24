@@ -1,11 +1,12 @@
 import { clean } from './utils'
 
-let defaultsTemplate = '', multiTemplate = '', filterTemplate = ''
+let defaultsTemplate = '', ruleTemplate = '', filterTemplate = ''
 
-export const shorts : Record<string, string> = {
+export const shortcuts : Record<string, string> = {
   // colors @C are handled runtime
   // same for @4
   //border radius
+  '@S': '',
   '@R': '$!none^0px!sm^2px!^4px!md^6px!lg^8px!xl^12px!2xl^16px!3xl^24px!full^9999px',
   '@B': '0^0px!^1px!2^2px!4^4px!8^8px',
   '@b': ';border-spacing:var(--tw-border-spacing-x) var(--tw-border-spacing-y)',
@@ -15,7 +16,7 @@ export const shorts : Record<string, string> = {
 }
 
 
-const addRule = (...args : string[]) => multiTemplate+= args.join('!') + '\n'
+const addRule = (...args : string[]) => ruleTemplate+= args.join('!') + '\n'
 
 const addFilter = (...args : string[]) => filterTemplate+= args.join('!') + '\n'
 
@@ -1818,9 +1819,9 @@ not-sr-only!position:static;width:auto;height:auto;padding:0;margin:0;overflow:v
 
 
 const defaultsTemplateParsed = clean(defaultsTemplate)
-const multiParsed = clean(multiTemplate)
+const ruleParsed = clean(ruleTemplate)
 const filterParsed = clean(filterTemplate)
-export {multiParsed as multiTemplate, filterParsed as filterTemplate, defaultsTemplateParsed as defaultsTemplate}
+export {ruleParsed as ruleTemplate, filterParsed as filterTemplate, defaultsTemplateParsed as defaultsTemplate}
 
 
 
