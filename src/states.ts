@@ -12,7 +12,7 @@ first!first-child
 last!last-child
 only!only-child
 odd!nth-child(odd)
-even!:nth-child(even)
+even!nth-child(even)
 first-of-type
 last-of-type
 only-of-type
@@ -31,8 +31,6 @@ placeholder-shown
 autofill
 read-only
 `)
-
-// before and after
 
 export const pseudoElements = dictionarify(`
 before
@@ -93,17 +91,3 @@ export const states = {
   parentModifiers,
 }
 
-
-// TODO:
-// min-[]  max-[]
-// aria-[…]![aria-…]
-// data-[…]![data-…]
-// group
-// @supports
-/*
-
-@media only screen and (max-width: 600px) and (min-width: 501px){
-
-}
-
-*/

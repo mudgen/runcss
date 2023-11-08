@@ -4,7 +4,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A utility-first CSS runtime for rapid UI development.",
   "main": "dist/runcss.min.mjs",
   "module": "dist/runcss.min.mjs",

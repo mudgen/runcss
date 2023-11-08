@@ -118,7 +118,7 @@ export default (options: Record<string, any>) => {
       }
     }
 
-    let rule = `${groups}${peers}.${clazz.replace(/[\[\]'.:()&@~*^$%,#\/]/g, '\\$&')
+    let rule = `${groups}${peers}.${clazz.replace(/[\[\]'.:()&@~*^$%,!#\/]/g, '\\$&')
       + categorizedStates.pseudoClasses.map(el => ':' + el).join('')
       + categorizedStates.pseudoElements.map(el => '::' + el).join('')
       + categorizedStates.modifiers.join('') + ' ' + parent
@@ -137,7 +137,7 @@ export default (options: Record<string, any>) => {
 
 
   const applyImportantModifier = (important : boolean, resolvedDeclaration : string) => important ?
-    resolvedDeclaration.replaceAll(';', '!important;') : resolvedDeclaration 
+    resolvedDeclaration.replaceAll(';', ' !important;') : resolvedDeclaration 
 
   /** Resolve tailwind classes into css declarations 
    * @param clazz a class, such as !sm:text-blue
@@ -165,10 +165,11 @@ export default (options: Record<string, any>) => {
     if(bracketIndex !== -1){
       const stateIndex = clazz.lastIndexOf(':', bracketIndex)
       const declaration = stateIndex === -1 ? clazz : clazz.substring(clazz.lastIndexOf(':') + 1)  
-      bracketIndex += stateIndex + 1
+      bracketIndex = declaration.indexOf('-[')
       const endBracketIndex = declaration.lastIndexOf(']')
       const property = declaration.substring(0, bracketIndex + 1)
       const value = declaration.substring(bracketIndex + 2, endBracketIndex).replaceAll('_', ' ')
+      console.log(value)
       if(!(property in arbitrary)) return
       const [resolvedValue, args] = arbitrary[property]
       return [
