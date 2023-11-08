@@ -169,7 +169,6 @@ export default (options: Record<string, any>) => {
       const endBracketIndex = declaration.lastIndexOf(']')
       const property = declaration.substring(0, bracketIndex + 1)
       const value = declaration.substring(bracketIndex + 2, endBracketIndex).replaceAll('_', ' ')
-      console.log(value)
       if(!(property in arbitrary)) return
       const [resolvedValue, args] = arbitrary[property]
       return [
