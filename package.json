@@ -4,7 +4,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A utility-first CSS runtime for rapid UI development.",
   "main": "dist/runcss.min.mjs",
   "module": "dist/runcss.min.mjs",
@@ -29,9 +29,9 @@
   "author": "Luca Fabbian, Nick Mudge",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lucafabbian/runcss/issues"
+    "url": "https://github.com/mudgen/runcss/issues"
   },
-  "homepage": "https://github.com/lucafabbian/runcss#readme",
+  "homepage": "https://github.com/mudgen/runcss#readme",
   "devDependencies": {
     "concurrently": "^8.2.1",
     "esbuild": "^0.19.4",

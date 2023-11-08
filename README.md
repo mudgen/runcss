@@ -108,6 +108,9 @@ If you find something missing, feel free to open an issue.
 
 By design, this parser is way less strict than Tailwind's one. This allows smaller builds and faster load times, but also means that wrong values may be turned into CSS rules regardless. This is intentional, because the browser will discard those rules anyway.
 
+### VSCode Intellisense
+To enable Tailwind's autocompletion, install the [official Tailwind extension](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss), and create an empty file called `tailwind.config.js` in the same folder of your html files.
+
 
 ## Build / contribute
 Clone this repository and use [bun](https://bun.sh/) to install dependencies:
