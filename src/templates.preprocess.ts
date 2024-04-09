@@ -1,5 +1,84 @@
 import { clean } from './utils'
 
+/*
+
+This file define all tailwind rules using a short, compat syntax.
+Special chars such as !, +, $ and so on act as marks or separator and
+provide a handful way to define common behaviours.
+
+At the end, this file will be preprocessed and turned into a giant
+multine string, which will be parsed at runtime. This is how we are able
+to compress all of tailwind in such a little space.
+
+
+You may add a rule in two ways.
+Appending it directly to "defaultsTemplate". Use ! to separate the class name
+from the class content, and put each rule in a new line. For example:
+
+defaultsTemplate+= `
+break-normal!overflow-wrap: normal;word-break: normal
+break-words!overflow-wrap: break-word
+break-all!word-break: break-all
+break-keep!word-break: keep-all
+`
+
+Using the "addRule" shorthand to define multiple classes at once.
+In its basic form, "addRule" takes the base tailwind class name,
+the css property and some key-value pairs separated by ^.
+For example, let's say we want to create two classes,
+container-sm        max-width: 640px;
+container-md        max-width: 768px;
+We may do it with the following rule:
+
+addRule('container', 'max-width: $px',
+  'sm^640',
+  'md^768',
+)
+
+We may use the $ in the second arg to specify where to insert
+the value. If no $ is set, we will assume the value is at the end.
+If the first arg would be the same as the second arg, we could
+pass an empty string. In the same way, we could omit the ^.
+For examples, let's say we want to create these two classes:
+break-before-auto        break-before: auto;
+break-before-all         break-before: all;
+We could leverage that they have the same name, and avoid repeat both
+'break-before' and 'auto'/'all'.
+
+addRule('break-before', '',
+  'auto',
+  'all',
+)
+
+
+In tailwind, some properties allow for custom values, such as
+bg-[customcolor]                 background-color: customcolor;
+To allow this, pass $ as third argument. For example:
+
+addRule('flex', '',
+  '$',
+  '1^1 1 0%',
+  'auto^1 1 auto',
+  'initial^0 1 auto',
+  'none'
+)
+
+Other rules include common parameters, such as colors, thicknesses and so on.
+To avoid reapeating those pattern, we defined some shortcuts, such as @C for colors.
+Check them below.
+
+
+Finally, you may prepend a rule with
+
+>rule                this rule will be applied to the descendants to the element, instead of the element itself
++rule                this rule will have priority over non-priority rules (=would override them)
+++rule, +++rule      even more priority
+
+
+*/
+
+
+
 let defaultsTemplate = '', ruleTemplate = '', filterTemplate = ''
 
 export const shortcuts : Record<string, string> = {
@@ -1268,20 +1347,19 @@ addRule('ring-offset', '--tw-ring-offset-color:$;box-shadow: 0 0 0 var(--tw-ring
 // EFFECTS
 
 // https://tailwindcss.com/docs/box-shadow
-addRule('shadow', 'box-shadow',
-  '$',
-  'sm^0 1px 2px 0 rgb(0 0 0 / 0.05)',
-  '^0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-  'md^0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  'lg^0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-  'xl^0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-  '2xl^0 25px 50px -12px rgb(0 0 0 / 0.25)',
-  'inner^inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
-  'none^0 0 #0000',
+addRule('shadow', '--tw-shadow:$;box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)',
+  'sm^0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color)',
+  'md^0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color)',
+  '^0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color)',
+  'lg^0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color)',
+  'xl^0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a;--tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color)',
+  '2xl^0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color)',
+  'inner^--tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color)',
+  'none^0 0 #0000;--tw-shadow-colored: 0 0 #0000',
 )
 
 // https://tailwindcss.com/docs/box-shadow-color
-addRule('shadow', '--tw-shadow-color',
+addRule('+shadow', '--tw-shadow-color:$;--tw-shadow: var(--tw-shadow-colored)',
   '$',
   '@C'
 )
