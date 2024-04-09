@@ -1,5 +1,8 @@
 import * as esbuild from 'esbuild'
 
+
+/** This hook would run ".preprocess.ts" files at build time and
+ * include the result instead of the source files. */
 const preprocessPlugin = {
   name: 'preprocess',
   setup(build) {

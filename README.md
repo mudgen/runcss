@@ -117,13 +117,13 @@ Clone this repository and use [bun](https://bun.sh/) to install dependencies:
 ```bash
 git clone https://github.com/lucafabbian/runcss.git
 cd runcss
-bun i
+npm i
 ```
 
 Then, you may use:
 ```bash
-bun run build    # Build for production
-bun run dev      # Build, watch for changes + start server with live reload! 
+npm run build    # Build for production
+npm run dev      # Build, watch for changes + start server with live reload! 
 ```
 
 
