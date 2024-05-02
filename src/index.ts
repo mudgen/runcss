@@ -37,7 +37,7 @@ export const extendRunCSS = (plugin: (arg0: any) => any) => {
   plugins.push(plugin)
 }
 
-export default (options: Record<string, any>) => {
+export default (options : Record<string, any> = {}) => {
   if(initialized) throw "Error: can't initialize RunCSS twice"
   initialized = true
 
@@ -196,7 +196,8 @@ export default (options: Record<string, any>) => {
    * 
    * @param classes space-separated list of classes to process
    */
-  const processClasses = (classes : string) => {
+  const processClasses = (classes : string | null) => {
+    if(!classes) return
     classes.split(' ').forEach(clazz => {
       clazz = clazz!.trim()
       if(!clazz || inserted.has(clazz)) return
@@ -215,7 +216,7 @@ export default (options: Record<string, any>) => {
 
     const config = {
       attributes: true, 
-      attributeFilter: ['class'],
+      //attributeFilter: ['class'],
       childList: true,
       subtree: true
     };
@@ -224,8 +225,11 @@ export default (options: Record<string, any>) => {
       for (const mutation of mutationList) {
         if(mutation.addedNodes){
           for(let node of mutation.addedNodes){
-            if(typeof node.hasAttribute === 'function' && node.hasAttribute('class')){
-              processClasses(node.getAttribute('class'))
+            if(typeof node.hasAttribute === 'function'){
+              if(node.hasAttribute('class')) processClasses(node.getAttribute('class'))
+              for(const element of document.querySelectorAll('*[class]')) {
+                processClasses(element.getAttribute("class"))
+              }
             }
           }
         }
@@ -239,6 +243,7 @@ export default (options: Record<string, any>) => {
     };
 
     const observer = new MutationObserver(callback);
+
     observer.observe(targetNode ?? document.body, config);
     observers.push(observer)
   }
