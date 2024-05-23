@@ -309,7 +309,7 @@ addRule('left', '', '@4')
 // https://tailwindcss.com/docs/visibility
 addRule('', 'visibility',
   'visible',
-  'invisible',
+  'invisible^hidden',
   'collapse',
 )
 

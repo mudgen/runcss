@@ -102,7 +102,8 @@ You may use it to either extend or override default values. Currently, this is n
 ```
 
 ## Caveats and differences with TailwindCSS 
-Currently, this project is still under development, but it aims to cover the totality of TailwindCSS classes.
+Currently, the project is production-ready, and should cover the totality of TailwindCSS classes.
+However, since we underwent a major rewrite recently, there may be some less common feature missing or misbehaving compared to Tailwind.
 
 If you find something missing, feel free to open an issue.
 
@@ -113,7 +114,7 @@ To enable Tailwind's autocompletion, install the [official Tailwind extension](h
 
 
 ## Build / contribute
-Clone this repository and use [bun](https://bun.sh/) to install dependencies:
+Clone this repository and use [npm](https://nodejs.org/en/download/package-manager) to install dependencies:
 ```bash
 git clone https://github.com/lucafabbian/runcss.git
 cd runcss
